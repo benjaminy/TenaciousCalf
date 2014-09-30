@@ -1,14 +1,14 @@
-# Hopy
+# Ligament
 
-Hybrid Persistent Data Structures in C
+Globally Persistent Locally Transient Data Structures
 
 ---
 
 _Functional programming is dead!  Long live functional programming!_
 
-Persistent data structures have been studied for decades, but recently
-many developer communities have generated renewed interest in the topic.
-The principal reasons for this interest are:
+Persistent data structures have been studied for decades, but had little
+impact on the lives of most working programmers until recently.  The
+principal reasons for this increase in interest are:
 
 * Mainstream applications are increasingly interactive (network, UI,
   etc.) compared to their forebears.  Interactive software has more
@@ -49,10 +49,9 @@ structures.  There are three primary factors behind these costs:
     hierarchy, and cache misses are terrible for performance.  Also,
     because the accesses are sequentially dependent, it is not possible
     to pipeline them.  Modern architectures love pipelining.
-* Finally, every update to a persistent structure involves copying a
-  handful of objects.  This is work that is totally unnecessary for
-  mutable structures and it puts a lot of pressure on the memory
-  allocator.
+* Every update to a persistent structure involves copying a handful of
+  objects.  This is work that is totally unnecessary for mutable
+  structures and it puts a lot of pressure on the memory allocator.
 
 How bad are these performance costs?  It's hard to give a simple answer
 to general performance questions like that, but it's not at all hard to
@@ -81,7 +80,7 @@ two main techniques used to achieve high performance are:
   root to the actual data you're interested in.  This library uses
   high-fanout structures, like B-trees and hash array mapped tries,
   which are a better fit for modern memory hierarchies.
-* _Hybrid persistence_.  The structures in this library are not purely
+* _Local transience_.  The structures in this library are not purely
   persistent, but rather hybrid persistent/transient.  Each structure is
   either in persistent or transient mode at any given time.  Critically,
   converting between modes is extremely cheap.  Converting to transient
@@ -325,6 +324,20 @@ along.
 #### Tell me more about the jargon used here.
 
 [Click me](/Documentation/whats_in_a_name.md)
+
+#### Is this related to semi-persistence?
+
+Not really.  My understanding of semi-persistence is that all "ancestor"
+versions of a data structure are readable.  However, if your program
+goes back to an older version and makes updates to it, that action
+"invalidates" any existing descendants of that version; no subsequent
+reads and updates may be performed on those.
+
+This notion of semi-persistence is quite different from GPLT.  With GPLT
+structures, each version in the history tree is either persistent or
+transient (and this is determined by how the application created them).
+Persistent versions can be used just like regular persistent structures.
+Transient versions can only by used if they are the most recent version.
 
 #### Why C?  C sucks.
 

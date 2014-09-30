@@ -94,7 +94,7 @@ seq_tree_p seq_alloc(
     unsigned level, unsigned *n, unsigned *max_range, unsigned *tag, leaf_p *prev );
 int seq_set( seq_tree_p t, unsigned idx, unsigned val,
              unsigned max, unsigned n, unsigned tag );
-int seq_get( seq_tree_p t, unsigned idx, unsigned level, unsigned *p,
+static int seq_get( seq_tree_p t, unsigned idx, unsigned level, unsigned *p,
              unsigned max, unsigned n, unsigned tag );
 int seq_set_mv( seq_tree_p t, unsigned idx, unsigned val,
                 unsigned max, unsigned n, unsigned tag, seq_tree_p *res );
@@ -359,7 +359,7 @@ int seq_set_mv( seq_tree_p t, unsigned idx, unsigned val,
     }
 }
 
-int seq_get( seq_tree_p t, unsigned idx, unsigned level, unsigned *p,
+static int seq_get( seq_tree_p t, unsigned idx, unsigned level, unsigned *p,
              unsigned max, unsigned n, unsigned tag )
 {
 #if 1

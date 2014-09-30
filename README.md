@@ -10,9 +10,9 @@ Persistent data structures have been studied for decades, but had little
 impact on the lives of most working programmers until recently.  The
 principal reasons for this increase in interest are:
 
-* Mainstream applications are increasingly interactive (network, UI,
-  etc.) compared to their forebears.  Interactive software has more
-  complex dynamic internal relationships than procedural software, and
+* Mainstream applications are increasingly interactive compared to their
+  forebears (network, UI, etc.).  Interactive software has more complex
+  dynamic internal relationships than procedural software, and
   persistent structures make it less likely that a change made in one
   corner of a large application will have adverse effects somewhere else
   down the road.
@@ -20,29 +20,36 @@ principal reasons for this increase in interest are:
   make it easier to write parallel software without going insane in the
   pit of data races, deadlocks and atomicity violations.
 
-Of course there are also the cool application-level things you have
-always been able to do with persistent structures:
+Of course persistent data structures have always had other cool tricks
+up their sleave:
 
-* Easy undo functionality
-* Easy backtracking algorithms and "what-if" analysis
+* They generally have better asymptotics than array-based structures for
+  fancy operations like concatenation and slicing
+* They simplify the implementation of undo functionality
+* They simplify the implementation of backtracking algorithms and
+  "what-if" analysis
 * &hellip;
 
 If you're not familiar with persistent data structures, Rich Hickey has
 some great broad introduction presentations up on youtube and infoq.
 
-As awesome as traditional persistent data structures are, they do have
-some serious performance costs relative to more conventional mutable
-structures.  There are three primary factors behind these costs:
+Researchers have done amazing work discovering persistent data
+structures that match (or come close to matching) their mutable cousins
+in terms of asymoptotics.  Unfortunately, textbook persistent structures
+typically have very high constant-factor overhead compared to the
+aforementioned cousins.  The reasons for this overhead are:
 
 * Persistent structures tend to be pointer-heavy.  This is essential,
-  not incidental.  Persistent structures must be split up into
-  relatively small pieces connected by pointers to keep the cost of
-  persistent updates down to a dull roar.  This has two consequences:
-  * Application data density in a persistent structure is lower than in
-    its mutable cousin; in some cases, much lower.  Application data
-    density matters a lot, because it has a direct impact on how
-    efficiently an application uses every level of the memory hierarchy,
-    from L1 cache to secondary storage paging.
+  not incidental.  Large persistent structures must be split up into
+  relatively small objects to keep the cost of persistent updates down
+  to a dull roar.  This has two related but distinct consequences:
+  * Application data density in a persistent structure is low; in some
+    cases _very_ low.  Application data density matters a lot, because
+    it has a direct impact on how efficiently an application uses every
+    level of the memory hierarchy, from L1 cache to secondary storage
+    paging.  [Here](/Documentation/linked_list.md) is a cute little
+    microbenchmark exercise that illustrates the importance of data
+    density.
   * It typically takes a least a few sequentially-dependent memory loads
     to get to the data your application is interested in.  Each of these
     loads is an opportunity to miss at each level of the memory

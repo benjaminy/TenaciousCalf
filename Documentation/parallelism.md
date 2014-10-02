@@ -28,6 +28,14 @@ people, I believe these techniques are all at best stalled right now:
    Scales badly with application complexity.
 
 
+For the near- to medium-term my money is on stealing and adapting _one_
+idea from the functional programming world: multi-version data
+structures. There are at least two strong efforts in this direction
+already in [Clojure](http://clojure.org/data_structures) and
+[.NET](http://www.nuget.org/packages/Microsoft.Bcl.Immutable). This
+project is about building and experimenting with fancy multi-version
+data structures in C.
+
 #### What is the connection between multi-version data and parallelism?
 
 Once a particular version of a multi-version data structure is created,

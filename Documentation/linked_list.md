@@ -19,5 +19,6 @@ part:
 
 The only thing that changes between the two versions of this experiment
 is the density of application data in the list (it goes from 1/2 to
-1/3).  In my implementation, this change nearly doubled the run time of
-iterating over the list!  Data density is super important!
+1/3).  The machine code for the iteration doesn't change at all.  In my
+implementation, this change nearly doubled the run time of iterating
+over the list!  Data density is super important!

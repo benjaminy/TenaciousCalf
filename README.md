@@ -8,20 +8,20 @@ _Functional programming is dead!  Long live functional programming!_
 
 Persistent data structures have been studied for decades, but had little
 impact on the lives of most working programmers until recently.  The
-principal reasons for this increase in interest are:
+principal reasons for this increasing interest are:
 
 * Mainstream applications are increasingly interactive compared to their
   forebears (network, UI, etc.).  Interactive software has more complex
   dynamic internal relationships than procedural software, and
   persistent structures make it less likely that a change made in one
-  corner of a large application will have adverse effects somewhere else
-  down the road.
+  corner of a large application will have unintended consequences
+  somewhere else down the road.
 * Parallel processors have gone mainstream.  Persistent data structures
   make it easier to write parallel software without going insane in the
   pit of data races, deadlocks and atomicity violations.
 
 Of course persistent data structures have always had other cool tricks
-up their sleave:
+up their sleeve:
 
 * They generally have better asymptotics than array-based structures for
   fancy operations like concatenation and slicing
@@ -34,10 +34,10 @@ If you're not familiar with persistent data structures, Rich Hickey has
 some great broad introduction presentations up on youtube and infoq.
 
 Researchers have done amazing work discovering persistent data
-structures that match (or come close to matching) their mutable cousins
-in terms of asymoptotics.  Unfortunately, textbook persistent structures
-typically have very high constant-factor overhead compared to the
-aforementioned cousins.  The reasons for this overhead are:
+structures that match (or come close to) their mutable cousins in terms
+of asymptotics.  Unfortunately, textbook persistent structures typically
+have very high constant-factor overhead compared to the aforementioned
+cousins.  The reasons for this overhead are:
 
 * Persistent structures tend to be pointer-heavy.  This is essential,
   not incidental.  Large persistent structures must be split up into
@@ -56,13 +56,15 @@ aforementioned cousins.  The reasons for this overhead are:
     hierarchy, and cache misses are terrible for performance.  Also,
     because the accesses are sequentially dependent, it is not possible
     to pipeline them.  Modern architectures love pipelining.
-* Every update to a persistent structure involves copying a handful of
-  objects.  This is work that is totally unnecessary for mutable
-  structures and it puts a lot of pressure on the memory allocator.
+* Every update to a persistent structure involves copying a small
+  handful of objects.
+  * This work is totally unnecessary for mutable structures.
+  * It is a fairly expensive kind of work: allocating and freeing lots
+    of little objects.
 
 How bad are these performance costs?  It's hard to give a simple answer
 to general performance questions like that, but it's not at all hard to
-cook up a microbenchmark that shows well-implemented persistent
+cook up a microbenchmark that shows well-implemented textbook persistent
 structures performing 10-100&times; slower than array-based cousins.
 Two caveats:
 
@@ -72,21 +74,21 @@ Two caveats:
 * As with any microbenchmarking, the impact on application performance
   will be diluted by all the other stuff that your application does.
 
-Caveats notwithstanding, the performance cost of persistence _can_ be
-large enough to dissuade well-informed developers from using persistent
-structures.  (Of course the details matter a lot.  "Persistent
-structures are fast enough" and "Persistent structures are too slow" are
-both laughably simplistic slogans.) This project is an attempt to spread
-the use of persistence by implementing high-performance hybrid
-persistent collections like sets, vectors, maps and graphs in C.  The
-two main techniques used to achieve high performance are:
+Caveats notwithstanding, the performance overhead of these structures is
+high enough to be a real liability for lots of applications.  (Of course
+the details matter a lot.  "Persistent structures are fast enough" and
+"Persistent structures are too slow" are both laughably simplistic
+slogans.) This project is an attempt to spread the use of persistence by
+implementing high-performance hybrid persistent collections like sets,
+vectors, maps and graphs in C.  The two main techniques used to achieve
+high performance are:
 
-* _Wide nodes_.  Most nodes are relatively large.  Many traditional
-  persistent structure implementations use low-fanout trees, which is
-  bad for both application data density, and the number of hops from the
-  root to the actual data you're interested in.  This library uses
-  high-fanout structures, like B-trees and hash array mapped tries,
-  which are a better fit for modern memory hierarchies.
+* _Chunking_.  Textbook persistent data structures have lots of very
+  small nodes.  Chunking is the strategy of grouping together a small
+  number of related nodes into a modestly-sized raw array (or similarly
+  efficient encoding).  Structures that exemplify this strategy are
+  B-trees and hash array mapped tries.  Chunking improves data density
+  and reduces the amount of pointer chasing.
 * _Local transience_.  The structures in this library are not purely
   persistent, but rather hybrid persistent/transient.  Each structure is
   either in persistent or transient mode at any given time.  Critically,
@@ -103,7 +105,7 @@ Hybrid persistence allows applications to use the following pattern:
 1. Make a local transient copy of a data structure
 2. Perform a raft of updates quickly in transient mode
 3. Make the structure persistent again and share it with the rest of the
-application.
+application
 
 This is almost as safe as a purely persistent approach, but with
 significant performance benefits.  As far as I know, Rich Hickey
@@ -111,14 +113,14 @@ pioneered this use of transience (I'd love to hear about prior work).
 You can read his thoughts on the matter here:
 http://clojure.org/transients.
 
-These two features (wide nodes and transience) have fairly strong
-synergy.  Wide nodes tend to improve read performance by prefetching
-nearby data (i.e. exploiting spatial locality) and reducing the number
-of pointer hops, but it hurts write performance because copying wide
-nodes is expensive (for example, on a 64-bit machine a single node might
-be 300 bytes).  Transience dramatically reduces the number of node
-copies needed.  So if an application can arrange to do most of its
-updates in transient mode bursts, it can get the best of both worlds.
+These two features (chunking and transience) have fairly strong synergy.
+Chunking tends to improve read performance by prefetching nearby data
+(i.e. exploiting spatial locality) and reducing the number of pointer
+hops, but it hurts write performance because copying chunks is expensive
+(for example, on a 64-bit machine a single node might be 300 bytes).
+Transience dramatically reduces the number of node copies needed.  So if
+an application can arrange to do most of its updates in transient mode
+bursts, it can get the best of both worlds.
 
 _A note to functional programming enthusiasts_: transient updates return
 a "new" root that may or may not refer to the same memory as the root
@@ -127,15 +129,7 @@ used safely.  Various kinds of static and dynamic checking can help
 ensure that programs don't violate this rule, but it is a potential
 pitfall.
 
-For the near- to medium-term my money is on stealing and adapting _one_
-idea from the functional programming world: multi-version data
-structures. There are at least two strong efforts in this direction
-already in [Clojure](http://clojure.org/data_structures) and
-[.NET](http://www.nuget.org/packages/Microsoft.Bcl.Immutable). This
-project is about building and experimenting with fancy multi-version
-data structures in C.
-
-### Here are the parameters of the project in Q&amp;A format:
+## Here are the parameters of the project in Q&amp;A format:
 
 #### What is a persistent data structure?
 
@@ -176,17 +170,13 @@ shared with the old structure.
 
 #### Trees?!?  Won't that create a log-slowdown?
 
-Yes, but&hellip; There has been some recent work on clever wide-node
-trees.  Using sufficiently wide trees means that for most intents and
-purposes the trees never get more than 5 or 6 layers deep.  More
-importantly, almost surely the first couple layers of the tree will be
-cached.  So even for unpredictable access patterns, there should be no
-more than 3 or 4 (expensive) main memory accesses.
-
-For certain access patterns, wide trees are still fairly slow compared
-to raw arrays, but they're _much_ better than your grandparents' linked
-lists or binary trees.  And the slowdown is FMIAP (for most intents and
-purposes) a small constant.
+Yes, but&hellip; There is a lot of very clever research out there on
+fancy ways to do persistent structures with good asymptotics.  Things
+like fingers and tries and whatnot.  So sometimes we can actually get
+worst-case or amortized constant time.  Then we throw in chunking which
+effectively makes the base of the logarithm high.  And a high-base
+logarithm is darn close to constant FMIAP (for most intents and
+purposes).
 
 (See for example the work of Phil Bagwell which has been taken up
 enthusiastically in the Clojure ecosystem.)

@@ -1,11 +1,12 @@
 #include <assert.h>
 #include <stdint.h>
 #include <stdlib.h>
+#include <unistd.h>
 #include <errno.h>
 #include <stdio.h>
 #include <sys/time.h>
 
-// #define DOUBLY
+#define DOUBLY
 
 struct timeval time_diff( struct timeval start, struct timeval end );
 int print_time( FILE *f, struct timeval tv );
@@ -22,80 +23,202 @@ struct ll_t
 #endif
 };
 
-#define N ( 10 * 1000 * 1000 )
-#define AGAIN 50
+#define N ( 20 * 1000 * 1000 )
+#define AGAIN 100
 
 static int ll_cons( item_t item, ll_p list, ll_p *res );
 
-int main( int argc, char **argv )
+#define TIMED_STMT(name, S) \
+do { \
+    struct timeval start, end, duration; \
+    /* printf( "%s START\n", name ); */ \
+    assert( !gettimeofday( &start, NULL ) ); \
+    S; \
+    assert( !gettimeofday( &end, NULL ) ); \
+    duration = time_diff( start, end ); \
+    printf( "%28s ", name ); \
+    assert( 0 < print_time( stdout, duration ) ); \
+} while( 0 )
+
+void __attribute__ ((noinline)) dense( void )
 {
-    struct timeval start, end, duration;
-    item_t x = 43;
+    item_t x = 43, y = 0;
+    item_t *a;
 
-    printf( "Array alloc %lu\n", sizeof( ll_t ) );
-    assert( !gettimeofday( &start, NULL ) );
-    item_t *a = (item_t *)malloc( N * sizeof( a[0] ) );
-    assert( !gettimeofday( &end, NULL ) );
-    duration = time_diff( start, end );
-    assert( 0 < print_time( stdout, duration ) );
-
-    printf( "Array init\n" );
-    assert( !gettimeofday( &start, NULL ) );
-    for( int i = N - 1; i >= 0; --i )
-    {
-        a[ i ] = x;
-        x = ( x * 17 ) + 59;
-    }
-    assert( !gettimeofday( &end, NULL ) );
-    duration = time_diff( start, end );
-    assert( 0 < print_time( stdout, duration ) );
-
-    item_t y = 0;
-    printf( "Array reads\n" );
-    assert( !gettimeofday( &start, NULL ) );
-    for( int j = 0; j < AGAIN; ++j )
-    {
-        for( unsigned i = 0; i < N; ++i )
+    TIMED_STMT( "Dense array alloc", a = (item_t *)malloc( N * sizeof( a[0] ) ) );
+    TIMED_STMT( "Dense array init", 
+        for( int i = N - 1; i >= 0; --i )
         {
-            y += a[ i ];
-        }
-    }
-    assert( !gettimeofday( &end, NULL ) );
-    duration = time_diff( start, end );
-    assert( 0 < print_time( stdout, duration ) );
+            a[ i ] = x;
+            x = ( x * 17 ) + 59;
+        } );
+    TIMED_STMT( "Dense array reads",
+        for( int j = 0; j < AGAIN; ++j )
+        {
+            for( unsigned i = 0; i < N; ++i )
+            {
+                y += a[ i ];
+            }
+        } );
     printf( "Magic number: %u\n", y );
     free( a );
+}
 
-    x = 43;
-    y = 0;
-    ll_p list = NULL;
-    printf( "List alloc and init\n" );
-    assert( !gettimeofday( &start, NULL ) );
-    for( unsigned i = N; i > 0; --i )
-    {
-        ll_p temp;
-        ll_cons( x, list, &temp );
-        list = temp;
-        x = ( x * 17 ) + 59;
-    }
-    assert( !gettimeofday( &end, NULL ) );
-    duration = time_diff( start, end );
-    assert( 0 < print_time( stdout, duration ) );
-
-    y = 0;
-    printf( "List reads\n" );
-    assert( !gettimeofday( &start, NULL ) );
-    for( int j = 0; j < AGAIN; ++j )
-    {
-        for( ll_p l = list; !!l; l = l->next )
+void __attribute__ ((noinline)) padded( void )
+{
+    int x = 43, y = 0;
+    item_t *pa2;
+    TIMED_STMT( "Padded array alloc", pa2 = (item_t *)malloc( 2 * N * sizeof( pa2[0] ) ) );
+    TIMED_STMT( "Padded array init",
+        for( int i = N - 1; i >= 0; --i )
         {
-            y += l->item;
-        }
-    }
-    assert( !gettimeofday( &end, NULL ) );
-    duration = time_diff( start, end );
-    assert( 0 < print_time( stdout, duration ) );
+            pa2[ 2 * i ] = x;
+            x = ( x * 17 ) + 59;
+        } );
+    TIMED_STMT( "Padded array reads",
+        for( int j = 0; j < AGAIN; ++j )
+        {
+            for( unsigned i = 0; i < N; ++i )
+            {
+                y += pa2[ 2 * i ];
+            }
+        } );
     printf( "Magic number: %u\n", y );
+    free( pa2 );
+}
+
+void __attribute__ ((noinline)) padded3( void )
+{
+    int x = 43, y = 0;
+    item_t *pa3;
+    TIMED_STMT( "Padded array 3 alloc", pa3 = (item_t *)malloc( 3 * N * sizeof( pa3[0] ) ) );
+    TIMED_STMT( "Padded array 3 init",
+        for( int i = N - 1; i >= 0; --i )
+        {
+            pa3[ 3 * i ] = x;
+            x = ( x * 17 ) + 59;
+        } );
+    TIMED_STMT( "Padded array reads",
+        for( int j = 0; j < AGAIN; ++j )
+        {
+            for( unsigned i = 0; i < N; ++i )
+            {
+                y += pa3[ 3 * i ];
+            }
+        } );
+    printf( "Magic number: %u\n", y );
+    free( pa3 );
+}
+
+void __attribute__ ((noinline)) pad_struct( void )
+{
+    int x = 43, y = 0;
+    ll_p sa;
+    TIMED_STMT( "Struct array alloc", sa = (ll_p)malloc( N * sizeof( sa[0] ) ) );
+    TIMED_STMT( "Struct array init",
+        for( int i = N - 1; i >= 0; --i )
+        {
+            sa[ i ].item = x;
+            x = ( x * 17 ) + 59;
+        } );
+    TIMED_STMT( "Struct array reads",
+        for( int j = 0; j < AGAIN; ++j )
+        {
+            for( unsigned i = 0; i < N; ++i )
+            {
+                y += sa[ i ].item;
+            }
+        } );
+    printf( "Magic number: %u\n", y );
+    free( sa );
+}
+
+void __attribute__ ((noinline)) self_ptr( void )
+{
+    int x = 43, y = 0;
+    ll_p spa;
+    TIMED_STMT( "Self ptr array alloc", spa = (ll_p)malloc( N * sizeof( spa[0] ) ) );
+    TIMED_STMT( "Self ptr array init",
+       for( int i = N - 1; i >= 0; --i )
+       {
+           spa[ i ].next = (ll_p)&spa[ i ].item;
+           spa[ i ].item = x;
+           x = ( x * 17 ) + 59;
+       } );
+    TIMED_STMT( "Self ptr array reads",
+        for( int j = 0; j < AGAIN; ++j )
+        {
+            for( unsigned i = 0; i < N; ++i )
+            {
+                y += ((item_t *)spa[ i ].next)[ 0 ];
+            }
+        } );
+    printf( "Magic number: %u\n", y );
+    free( spa );
+}
+
+void __attribute__ ((noinline)) malloc_ptr( void )
+{
+    int x = 43, y = 0;
+    item_t **mpa;
+    TIMED_STMT( "Malloc ptr array alloc", mpa = (item_t **)malloc( N * sizeof( mpa[0] ) ) );
+    TIMED_STMT( "Malloc Ptr array init",
+        for( int i = N - 1; i >= 0; --i )
+        {
+            mpa[ i ] = (item_t *)malloc( sizeof( mpa[0][0] ) );
+            mpa[ i ][ 0 ] = x;
+            x = ( x * 17 ) + 59;
+        } );
+    TIMED_STMT( "Ptr array reads",
+        for( int j = 0; j < AGAIN; ++j )
+        {
+            for( unsigned i = 0; i < N; ++i )
+            {
+                y += mpa[ i ][0];
+            }
+        } );
+    TIMED_STMT( "Malloc Ptr array dealloc",
+        for( int i = N - 1; i >= 0; --i )
+        {
+            free( mpa[ i ] );
+        } );
+    printf( "Magic number: %u\n", y );
+}
+
+void __attribute__ ((noinline)) linked( void )
+{
+    int x = 43, y = 0;
+    ll_p list = NULL;
+    TIMED_STMT( "List alloc and init",
+        for( unsigned i = N; i > 0; --i )
+        {
+            ll_p temp;
+            ll_cons( x, list, &temp );
+            list = temp;
+            x = ( x * 17 ) + 59;
+        } );
+    TIMED_STMT( "List reads",
+        for( int j = 0; j < AGAIN; ++j )
+        {
+            for( ll_p l = list; !!l; l = l->next )
+            {
+                y += l->item;
+            }
+        } );
+    printf( "Magic number: %u\n", y );
+}
+
+int main( int argc, char **argv )
+{
+    sleep( 1 );
+    printf( "DONE SLEEPING\n" );
+    dense();
+    padded();
+    padded3();
+    pad_struct();
+    self_ptr();
+    malloc_ptr();
+    linked();
     return 0;
 }
 

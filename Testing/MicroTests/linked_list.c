@@ -23,7 +23,7 @@ struct ll_t
 #endif
 };
 
-#define N ( 20 * 1000 * 1000 )
+#define N ( 40 * 1000 * 1000 )
 #define AGAIN 100
 
 static int ll_cons( item_t item, ll_p list, ll_p *res );
@@ -52,6 +52,7 @@ void __attribute__ ((noinline)) dense( void )
             a[ i ] = x;
             x = ( x * 17 ) + 59;
         } );
+
     TIMED_STMT( "Dense array reads",
         for( int j = 0; j < AGAIN; ++j )
         {

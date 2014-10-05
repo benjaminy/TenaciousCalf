@@ -248,13 +248,13 @@ on the other.  On a 64-bit machine each node will probably cost 32 bytes:
 (because of alignment constraints). 32&times; memory overhead is
 horrendous; totally intolerable for a reasonably large collection.
 
-The basic strategy for keeping memory efficiency high is to make the
-leaves "wide", just like the internal nodes of the trees.  So the bytes
-of the leaves are mostly devoted to a plain array of application data.
-The goal for the project is sub-2&times; overhead compared to the most
-compact reasonable implementation.  (If this sounds implausible think
-about how very small the number of internal nodes is compared to the
-number of leaves in a high-degree tree.)
+The basic strategy for keeping memory efficiency high is "chunking" a
+modest number (say 32) of values together into a single array.  So the
+bytes of the leaves are mostly devoted to a plain array of application
+data.  The goal for the project is sub-2&times; overhead compared to the
+most compact reasonable implementation.  (If this sounds implausible
+think about how very small the number of internal nodes is compared to
+the number of leaves in a high-degree tree.)
 
 Memory overhead is _super_ important, because there is a direct
 relationship between it and the amount of actual application data that

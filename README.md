@@ -194,8 +194,7 @@ purposes).
 (See for example the work of Phil Bagwell which has been taken up
 enthusiastically in the Clojure ecosystem.)
 
-#### Every persistent update creates a new structure; what happens to
-the old ones?
+#### Every persistent update creates a new structure; what happens to the old ones?
 
 All extensive persistent data structure libraries I am familiar with are
 implemented in languages with garbage collection, so old versions can

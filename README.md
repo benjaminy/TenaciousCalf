@@ -11,11 +11,11 @@ impact on the lives of most working programmers until recently.  The
 principal reasons for this increasing interest are:
 
 * Mainstream applications are increasingly interactive compared to their
-  forebears (network, UI, etc.).  Interactive software has more complex
-  dynamic internal relationships than procedural software, and
-  persistent structures make it less likely that a change made in one
-  corner of a large application will have unintended consequences
-  somewhere else down the road.
+  forebears (network communication, UI, physical controls etc.).
+  Interactivity is directly related to complex dynamic internal
+  dependencies, and persistent structures make it less likely that a
+  change made in one corner of a large application will have unintended
+  consequences somewhere else down the road.
 * Parallel processors have gone mainstream.  Persistent data structures
   make it easier to write parallel software without going insane in the
   pit of data races, deadlocks and atomicity violations.
@@ -60,12 +60,12 @@ cousins.  The reasons for this overhead are:
   handful of objects.
   * This work is totally unnecessary for mutable structures.
   * It is a fairly expensive kind of work: allocating and freeing lots
-    of little objects.
+    of small-ish objects.
 
 How bad are these performance costs?  It's hard to give a simple answer
 to general performance questions like that, but it's not at all hard to
 cook up a microbenchmark that shows well-implemented textbook persistent
-structures performing 10-100&times; slower than array-based cousins.
+structures performing 10&times; slower than array-based cousins.
 Two caveats:
 
 * This is not an apples-to-apples comparison.  Persistent structures
@@ -85,7 +85,7 @@ high performance are:
 
 * _Chunking_.  Textbook persistent data structures have lots of very
   small nodes.  Chunking is the strategy of grouping together a small
-  number of related nodes into a modestly-sized raw array (or similarly
+  number of "nearby" nodes into a modestly-sized raw array (or similarly
   efficient encoding).  Structures that exemplify this strategy are
   B-trees and hash array mapped tries.  Chunking improves data density
   and reduces the amount of pointer chasing.
@@ -316,25 +316,15 @@ along.
 
 #### What is the connection with parallelism?
 
-[Click me](/Documentation/parallelism.md)
+[Parallelism and persistence](/Documentation/parallelism.md)
 
 #### Tell me more about the jargon used here.
 
-[Click me](/Documentation/whats_in_a_name.md)
+[What's in a name?](/Documentation/whats_in_a_name.md)
 
-#### Is this related to semi-persistence?
+#### Is this related to semi-persistence or partial persistance?
 
-Not really.  My understanding of semi-persistence is that all "ancestor"
-versions of a data structure are readable.  However, if your program
-goes back to an older version and makes updates to it, that action
-"invalidates" any existing descendants of that version; no subsequent
-reads and updates may be performed on those.
-
-This notion of semi-persistence is quite different from GPLT.  With GPLT
-structures, each version in the history tree is either persistent or
-transient (and this is determined by how the application created them).
-Persistent versions can be used just like regular persistent structures.
-Transient versions can only by used if they are the most recent version.
+[The many flavors of persistence](/Documentation/flavors_of_persistence.md)
 
 #### Why C?  C sucks.
 

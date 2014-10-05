@@ -41,8 +41,8 @@ is useful for backtracking algorithms.
 
 ### On-demand
 
-With on-demand persistence, the client code chooses for each access
-whether it should be done in persistent mode or transient mode.  You can
+Persistence on-demand data structures can be updated in persistent mode
+or transient mode, according to the whims of the client code.  You can
 think of each version in the version tree being tagged with a
 persistent/transient bit.  Old transient versions cannot be queried or
 updated, but all old persistent versions can be.
@@ -52,8 +52,9 @@ updated, but all old persistent versions can be.
 Confluently persistent data structures are actually "stronger" than
 plain fully persistent structures.  In addition to regular persistent
 updates, versions from different branches of the version tree can be
-merged asymptotically more efficiently than merging unrelated instances
-of that type.
+combined more efficiently than combining unrelated instances of that
+type.  Confluence turns the version "tree" into a directed acyclic
+graph.
 
 ### Thread-safe
 
@@ -61,8 +62,9 @@ This one might seem odd, since one of the selling points of persistent
 structures is that they make it easier to write reliable multithreaded
 software.  The issue is that some persistent structures use lazy
 evaluation or memoization to pull off their magic.  This means that
-while old versions are logically immutable, physically old versions may
-refer to unevaluated expressions that get filled in at some later time.
+while old versions are logically immutable, they may refer to
+unevaluated expressions that get filled in later.  This means that under
+the hood, the bits referred to by old versions can actually change.
 
 Thread safety cannot be taken for granted when you're talking about lazy
 evaluation/memoization.  So if you're working in a language/framework

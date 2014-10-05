@@ -58,15 +58,18 @@ aforementioned cousins.  The reasons for this overhead are:
     cases _very_ low.  Application data density matters a lot, because
     it has a direct impact on how efficiently an application uses every
     level of the memory hierarchy, from L1 cache to secondary storage
-    paging.  [Here](/Documentation/linked_list.md) is a cute little
-    microbenchmark exercise that illustrates the importance of data
-    density.
+    paging.
   * It typically takes a least a few sequentially-dependent memory loads
     to get to the data your application is interested in.  Each of these
     loads is an opportunity to miss at each level of the memory
     hierarchy, and cache misses are terrible for performance.  Also,
     because the accesses are sequentially dependent, it is not possible
     to pipeline them.  Modern architectures love pipelining.
+
+  [A cute little microbenchmarking exercise that illustrates the
+  importance of data density and pointer
+  chasing.](/Documentation/linked_list.md).
+
 * Every update to a persistent structure involves copying a small
   handful of objects.
   * This work is totally unnecessary for mutable structures.

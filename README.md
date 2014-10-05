@@ -65,14 +65,15 @@ aforementioned cousins.  The reasons for this overhead are:
     hierarchy, and cache misses are terrible for performance.  Also,
     because the accesses are sequentially dependent, it is not possible
     to pipeline them.  Modern architectures love pipelining.
-  [A cute little microbenchmarking exercise that illustrates the
-  importance of data density and pointer
-  chasing.](/Documentation/linked_list.md).
 * Every update to a persistent structure involves copying a small
   handful of objects.
   * This work is totally unnecessary for mutable structures.
   * It is a fairly expensive kind of work: allocating and freeing lots
     of small-ish objects.
+
+[A cute little microbenchmarking exercise that illustrates the
+importance of data density and pointer
+chasing.](/Documentation/linked_list.md).
 
 How bad are these performance costs?  It's hard to give a simple answer
 to general performance questions like that, but it's not at all hard to

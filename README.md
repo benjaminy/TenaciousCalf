@@ -4,27 +4,38 @@ Globally Persistent Locally Transient Data Structures
 
 ---
 
-_Functional programming is dead!  Long live functional programming!_
+_First they ignore you.  Then they ridicule you.  And then they attack
+you and want to burn you.  And then they build monuments to you.  And
+that, is what is going to happen to the functional style of
+programming._
+
+(Apologies to the ghost of Nicholas Klein.)
+
+[TL;DR: This project is an experiment in making persistent data
+structures that can compete with their transient/mutable cousins in
+terms of asymptotic and constant-factor performance.  The main
+techniques used to get there are chunking to improve memory efficiency
+and application-controlled hybrid persistence/transience.]
 
 Persistent data structures have been studied for decades, but had little
 impact on the lives of most working programmers until recently.  The
-principal reasons for this increasing interest are:
+principal reasons for this changing tide are:
 
 * Mainstream applications are increasingly interactive compared to their
-  forebears (network communication, UI, physical controls etc.).
+  forebears (network communication, UI, physical controls, etc.).
   Interactivity is directly related to complex dynamic internal
-  dependencies, and persistent structures make it less likely that a
-  change made in one corner of a large application will have unintended
+  dependencies, and persistent data makes it less likely that a change
+  made in one corner of a large application will have unintended
   consequences somewhere else down the road.
-* Parallel processors have gone mainstream.  Persistent data structures
-  make it easier to write parallel software without going insane in the
-  pit of data races, deadlocks and atomicity violations.
+* Parallel processors have gone mainstream.  Persistent data makes it
+  easier to write parallel software without going insane in the pit of
+  data races, deadlocks and atomicity violations.
 
 Of course persistent data structures have always had other cool tricks
 up their sleeve:
 
-* They generally have better asymptotics than array-based structures for
-  fancy operations like concatenation and slicing
+* They generally have better asymptotics than their transient cousins
+  for fancy operations like concatenation and slicing
 * They simplify the implementation of undo functionality
 * They simplify the implementation of backtracking algorithms and
   "what-if" analysis
@@ -34,10 +45,10 @@ If you're not familiar with persistent data structures, Rich Hickey has
 some great broad introduction presentations up on youtube and infoq.
 
 Researchers have done amazing work discovering persistent data
-structures that match (or come close to) their mutable cousins in terms
-of asymptotics.  Unfortunately, textbook persistent structures typically
-have very high constant-factor overhead compared to the aforementioned
-cousins.  The reasons for this overhead are:
+structures that match (or come close to) their transient cousins in
+terms of asymptotics.  Unfortunately, textbook persistent structures
+typically have very high constant-factor overhead compared to the
+aforementioned cousins.  The reasons for this overhead are:
 
 * Persistent structures tend to be pointer-heavy.  This is essential,
   not incidental.  Large persistent structures must be split up into

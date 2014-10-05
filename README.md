@@ -50,11 +50,11 @@ terms of asymptotics.  Unfortunately, textbook persistent structures
 typically have very high constant-factor overhead compared to the
 aforementioned cousins.  The reasons for this overhead are:
 
-* Persistent structures tend to be pointer-heavy.  This is essential,
-  not incidental.  Large persistent structures must be split up into
+* Persistent data tend to be pointer-heavy.  This is essential, not
+  incidental.  Large persistent structures must be split up into
   relatively small objects to keep the cost of persistent updates down
   to a dull roar.  This has two related but distinct consequences:
-  * Application data density in a persistent structure is low; in some
+  * Application data density in persistent structures is low; in some
     cases _very_ low.  Application data density matters a lot, because
     it has a direct impact on how efficiently an application uses every
     level of the memory hierarchy, from L1 cache to secondary storage
@@ -65,15 +65,15 @@ aforementioned cousins.  The reasons for this overhead are:
     hierarchy, and cache misses are terrible for performance.  Also,
     because the accesses are sequentially dependent, it is not possible
     to pipeline them.  Modern architectures love pipelining.
-* Every update to a persistent structure involves copying a small
-  handful of objects.
-  * This work is totally unnecessary for mutable structures.
+* Every update to persistent data involves copying a small handful of
+  objects.
+  * This work is totally unnecessary for mutable data.
   * It is a fairly expensive kind of work: allocating and freeing lots
     of small-ish objects.
 
 [A cute little microbenchmarking exercise that illustrates the
 importance of data density and pointer
-chasing.](/Documentation/linked_list.md).
+chasing](/Documentation/linked_list.md).
 
 How bad are these performance costs?  It's hard to give a simple answer
 to general performance questions like that, but it's not at all hard to
@@ -81,17 +81,17 @@ cook up a microbenchmark that shows well-implemented textbook persistent
 structures performing 10&times; slower than array-based cousins.
 Two caveats:
 
-* This is not an apples-to-apples comparison.  Persistent structures
-  give you the superpower of using multiple versions of a structure
-  simultaneously; mutable structures can't do that.
+* This is not an apples-to-apples comparison.  Persistent data gives
+  your software the superpower of using multiple versions of a structure
+  simultaneously; mutable data can't do that.
 * As with any microbenchmarking, the impact on application performance
   will be diluted by all the other stuff that your application does.
 
 Caveats notwithstanding, the performance overhead of these structures is
 high enough to be a real liability for lots of applications.  (Of course
-the details matter a lot.  "Persistent structures are fast enough" and
-"Persistent structures are too slow" are both laughably simplistic
-slogans.) This project is an attempt to spread the use of persistence by
+the details matter a lot.  "Persistent data is fast enough" and
+"Persistent data is too slow" are both laughably simplistic slogans.)
+This project is an attempt to spread the use of persistence by
 implementing high-performance hybrid persistent collections like sets,
 vectors, maps and graphs in C.  The two main techniques used to achieve
 high performance are:
@@ -120,20 +120,20 @@ Hybrid persistence allows applications to use the following pattern:
 3. Make the structure persistent again and share it with the rest of the
 application
 
-This is almost as safe as a purely persistent approach, but with
-significant performance benefits.  As far as I know, Rich Hickey
-pioneered this use of transience (I'd love to hear about prior work).
-You can read his thoughts on the matter here:
+This pattern mostly preserves the software engineering benefits of pure
+persistence, and brings substantial performance benefits.  As far as I
+know, Rich Hickey pioneered this use of transience (I'd love to hear
+about prior work).  You can read his thoughts on the matter here:
 http://clojure.org/transients.
 
 These two features (chunking and transience) have fairly strong synergy.
 Chunking tends to improve read performance by prefetching nearby data
 (i.e. exploiting spatial locality) and reducing the number of pointer
-hops, but it hurts write performance because copying chunks is expensive
-(for example, on a 64-bit machine a single node might be 300 bytes).
-Transience dramatically reduces the number of node copies needed.  So if
-an application can arrange to do most of its updates in transient mode
-bursts, it can get the best of both worlds.
+hops, but it hurts write performance because copying chunks is more
+expensive than copying very small nodes.  Transience dramatically
+reduces the number of node copies needed.  So if an application can
+arrange to do most of its updates in transient mode bursts, it can get
+the best of both worlds.
 
 _A note to functional programming enthusiasts_: transient updates return
 a "new" root that may or may not refer to the same memory as the root
@@ -194,12 +194,12 @@ purposes).
 (See for example the work of Phil Bagwell which has been taken up
 enthusiastically in the Clojure ecosystem.)
 
-#### How do the old versions go away?
+#### Every persistent update creates a new structure; what happens to
+the old ones?
 
-Every modification creates a new structure, so what happens to the old
-ones?  All extensive persistent data structure libraries I am familiar
-with are implemented in languages with garbage collection, so old
-versions can just be collected when they are no longer reachable.
+All extensive persistent data structure libraries I am familiar with are
+implemented in languages with garbage collection, so old versions can
+just be collected when they are no longer reachable.
 
 Obviously the assume-garbage-collection strategy doesn't work in C, so
 the structures in this library use reference counting to know when old

@@ -23,8 +23,8 @@ struct ll_t
 #endif
 };
 
-#define N ( 40 * 1000 * 1000 )
-#define AGAIN 100
+#define N ( 1000 * 1000 * 1000 )
+#define AGAIN 5
 
 static int ll_cons( item_t item, ll_p list, ll_p *res );
 

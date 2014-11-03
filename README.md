@@ -304,7 +304,8 @@ As far as I'm aware, Haskell's ST monad doesn't automatically give you
 the extremely cheap switching between persistent and transient mode.  I
 don't know Haskell well enough to say how hard it would be to implement
 data structures with the same performance characteristics as this
-library.
+library.  Here's one attempt to do something like that: [ezyang's
+blog](http://blog.ezyang.com/2010/03/the-case-of-the-hash-array-mapped-trie/).
 
 #### Can you summarize the overhead story?
 

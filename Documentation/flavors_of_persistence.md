@@ -6,46 +6,45 @@ including:
 - Full
 - Partial
 - Semi
-- On demand
+- On-demand
 - Confluent
 - Thread-safe
 
 This page gives quick descriptions of each flavor.  Note that when one
 talks about the operations and patterns that a particular flavor of
-persistence _can support_, what that really means is "can perform
-asymptotically more efficiently than just na&iuml;vely doing a ton of
+persistence _supports_, what that really means is "performs
+asymptotically more efficiently than na&iuml;vely doing a ton of
 copying."
 
 ### Full
 
-"Fully persistent" is what most people mean most of the time when when
-they talk about persistent structures.  All updates to a structure give
-you back both the old (pre-update) and new versions.  Both old and new
-versions can be queried and updated without restrictions.  You can
-imagine a collection of updates creating a tree of versions of the data
-structure.
+"Fully persistent" is what most people mean most of the time when they
+talk about persistence.  All updates to a structure give you back both
+the old (pre-update) and new versions.  Both old and new versions can be
+queried and updated without restrictions.  You can imagine a collection
+of operations creating a tree of versions of the data structure.
 
 ### Partial
 
-Partially persistent data structures allow old versions to be queried,
-but not updated.  In other words, the version "tree" is just a linear
+Partially persistent data structures support querying old versions, but
+not updating.  In other words, the version "tree" is just a linear
 chain.
 
 ### Semi
 
-Semi-persistent data structures allow old versions to be queried and
-updated.  However, updating an old version invalidates any "more recent"
-versions.  Visually, you can think of all of the branches of the version
-tree other than the one with the most recent version being "dead".  This
-is useful for backtracking algorithms.
+Semi-persistent data structures support querying and updating old
+versions, with a catch: Updating an old version invalidates any "more
+recent" versions.  You can think of all of the branches of the version
+tree other than the "most recent" one being "dead".  This is useful for
+backtracking algorithms.
 
 ### On-demand
 
-Persistence on-demand data structures can be updated in persistent mode
-or transient mode, according to the whims of the client code.  You can
-think of each version in the version tree being tagged with a
-persistent/transient bit.  Old transient versions cannot be queried or
-updated, but all old persistent versions can be.
+On-demand-persistent data structures can be updated in persistent mode
+or transient mode, according to the whims of client code.  You can think
+of each version in the version tree being flagged as persistent or
+transient.  Old transient versions cannot be queried or updated, but all
+old persistent versions can be.
 
 ### Confluent
 

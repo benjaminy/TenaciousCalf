@@ -1,6 +1,6 @@
 # Ligament
 
-Globally Persistent Locally Transient Data Structures
+Chunky, On-Demand Persistent Data Structures
 
 ---
 
@@ -15,11 +15,11 @@ programming._
 structures that can compete with their transient/mutable cousins in
 terms of asymptotic and constant-factor performance.  The main
 techniques used to get there are chunking to improve memory efficiency
-and application-controlled hybrid persistence/transience.]
+and on-demand hybrid persistence/transience.]
 
 Persistent data structures have been studied for decades, but had little
 impact on the lives of most working programmers until recently.  The
-principal reasons for this changing tide are:
+principal reasons for the changing tide are:
 
 * Mainstream applications are increasingly interactive compared to their
   forebears (network communication, UI, physical controls, etc.).
@@ -31,18 +31,18 @@ principal reasons for this changing tide are:
   easier to write parallel software without going insane in the pit of
   data races, deadlocks and atomicity violations.
 
-Of course persistent data structures have always had other cool tricks
-up their sleeve:
+Of course persistent structures have always had other cool tricks up
+their sleeve:
 
-* They generally have better asymptotics than their transient cousins
-  for fancy operations like concatenation and slicing
 * They simplify the implementation of undo functionality
 * They simplify the implementation of backtracking algorithms and
   "what-if" analysis
+* They generally have better asymptotics than their transient cousins
+  for fancy operations like concatenation and slicing
 * &hellip;
 
 If you're not familiar with persistent data structures, Rich Hickey has
-some great broad introduction presentations up on youtube and infoq.
+some great introduction presentations up on youtube and infoq.
 
 Researchers have done amazing work discovering persistent data
 structures that match (or come close to) their transient cousins in
@@ -89,12 +89,12 @@ Two caveats:
 
 Caveats notwithstanding, the performance overhead of these structures is
 high enough to be a real liability for lots of applications.  (Of course
-the details matter a lot.  "Persistent data is fast enough" and
-"Persistent data is too slow" are both laughably simplistic slogans.)
-This project is an attempt to spread the use of persistence by
-implementing high-performance hybrid persistent collections like sets,
-vectors, maps and graphs in C.  The two main techniques used to achieve
-high performance are:
+the details matter a lot.  "Persistent data structures are fast enough"
+and "Persistent structures are too slow" are both laughably simplistic
+slogans.)  This project is an attempt to spread the use of persistence
+by implementing high-performance hybrid persistent collections like
+sets, vectors, maps and graphs in C.  The two main techniques used to
+achieve high performance are:
 
 * _Chunking_.  Textbook persistent data structures have lots of very
   small nodes.  Chunking is the strategy of grouping together a small
@@ -111,7 +111,7 @@ high performance are:
   structure are copied lazily, as needed.  Updates in transient mode are
   cheap, because it is usually not necessary to make copies of nodes.
   Converting to persistent mode is even cheaper: just set the
-  persistent/transient bit in the root.
+  persistent/transient flag in the root.
 
 Hybrid persistence allows applications to use the following pattern:
 
@@ -136,11 +136,10 @@ arrange to do most of its updates in transient mode bursts, it can get
 the best of both worlds.
 
 _A note to functional programming enthusiasts_: transient updates return
-a "new" root that may or may not refer to the same memory as the root
-before the update.  After the update the "old" root can no longer be
-used safely.  Various kinds of static and dynamic checking can help
-ensure that programs don't violate this rule, but it is a potential
-pitfall.
+a root that may or may not refer to the same memory as the root before
+the update.  After the update the "old" root can no longer be used
+safely.  Various kinds of static and dynamic checking can help ensure
+that programs don't violate this rule, but it is a potential pitfall.
 
 ## Here are the parameters of the project in Q&amp;A format:
 
@@ -256,12 +255,12 @@ most compact reasonable implementation.  (If this sounds implausible
 think about how very small the number of internal nodes is compared to
 the number of leaves in a high-degree tree.)
 
-Memory overhead is _super_ important, because there is a direct
-relationship between it and the amount of actual application data that
-can fit in _every level_ of the memory hierarchy.  Efficient use of the
-memory hierarchy is generally the most important performance
-optimization for developers to spend their time worrying about.  (After
-getting the asymptotics in the right ballpark, of course.)
+It's hard to overstate the importance of memory efficiency, because it
+is directly related to the amount of actual application data that can
+fit in _every level_ of the memory hierarchy.  Efficient use of the
+memory hierarchy is among the most important factors for general
+application performance tuning.  (After getting the asymptotics in the
+right ballpark, of course.)
 
 #### What is this transient mode thing?
 
@@ -284,8 +283,7 @@ bit in memory management overhead.
 The benefit of transient mode is proportional to the number of updates
 you do before converting back to persistent mode.  In the extreme,
 performing a single update in transient mode before converting back is
-almost identical (in performance) to just doing a regular persistent
-update.
+almost identical (in performance) to just doing a persistent update.
 
 #### I smell monads.
 

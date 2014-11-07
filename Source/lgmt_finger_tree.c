@@ -67,6 +67,7 @@ int lgmt_finger_tree_constr( finger_tree_root_p r )
 int lgmt_finger_tree_prepend(
     finger_tree_root_p r_source, value_t v, finger_tree_root_p r )
 {
+  /*  */
     if( r != r_source )
         *r = *r_source;
     r->refcount = 1;

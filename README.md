@@ -22,7 +22,7 @@ impact on the lives of most working programmers until recently.  The
 principal reasons for the changing tide are:
 
 * Mainstream applications are increasingly interactive compared to their
-  forebears (network communication, UI, physical controls, etc.).
+  forebears (network communication, UI, physical controls, etc).
   Interactivity is directly related to complex dynamic internal
   dependencies, and persistent data makes it less likely that a change
   made in one corner of a large application will have unintended

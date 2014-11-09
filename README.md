@@ -13,9 +13,9 @@ programming._
 
 [TL;DR: This project is an experiment in making persistent data
 structures that can compete with their transient/mutable cousins in
-terms of asymptotic and constant-factor performance.  The main
+terms of asymptotic _and_ constant-factor performance.  The main
 techniques used to get there are chunking to improve memory efficiency
-and on-demand hybrid persistence/transience.]
+and on-demand hybrid persistence/transience to reduce copying overhead.]
 
 Persistent data structures have been studied for decades, but had little
 impact on the lives of most working programmers until recently.  The

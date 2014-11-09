@@ -15,7 +15,7 @@ programming._
 structures that can compete with their transient/mutable cousins in
 terms of asymptotic _and_ constant-factor performance.  The main
 techniques used to get there are chunking to improve memory efficiency
-and on-demand hybrid persistence/transience to reduce copying overhead.]
+and on-demand persistence/transience to reduce copying overhead.]
 
 Persistent data structures have been studied for decades, but had little
 impact on the lives of most working programmers until recently.  The
@@ -92,9 +92,9 @@ high enough to be a real liability for lots of applications.  (Of course
 the details matter a lot.  "Persistent data structures are fast enough"
 and "Persistent structures are too slow" are both laughably simplistic
 slogans.)  This project is an attempt to spread the use of persistence
-by implementing high-performance hybrid persistent collections like
-sets, vectors, maps and graphs in C.  The two main techniques used to
-achieve high performance are:
+by implementing high-performance persistent collections like sets,
+vectors, maps and graphs in C.  The two main techniques used to achieve
+high performance are:
 
 * _Chunking_.  Textbook persistent data structures have lots of very
   small nodes.  Chunking is the strategy of grouping together a small
@@ -102,18 +102,17 @@ achieve high performance are:
   efficient encoding).  Structures that exemplify this strategy are
   B-trees and hash array mapped tries.  Chunking improves data density
   and reduces the amount of pointer chasing.
-* _Local transience_.  The structures in this library are not purely
-  persistent, but rather hybrid persistent/transient.  Each structure is
-  either in persistent or transient mode at any given time.  Critically,
-  converting between modes is extremely cheap.  Converting to transient
-  mode logically copies the entire structure, but in implementation
-  terms only a copy of the root node is required.  Other pieces of the
-  structure are copied lazily, as needed.  Updates in transient mode are
-  cheap, because it is usually not necessary to make copies of nodes.
-  Converting to persistent mode is even cheaper: just set the
-  persistent/transient flag in the root.
 
-Hybrid persistence allows applications to use the following pattern:
+* _On-demand persistence_.  The structures in this library are not
+  purely persistent, but rather on-demand persistent/transient.
+  Application code chooses whether each update should be persistent or
+  transient (i.e. destructive/mutable).  Performing a transient update
+  after a persistent update logically makes a transient-mode clone of
+  the whole structure.  Luckily might sound expensive, but it can be
+  made very cheap by tagging nodes as persistent/transient and
+  performing the copying lazily.
+
+On-demand persistence allows applications to use the following pattern:
 
 1. Make a local transient copy of a data structure
 2. Perform a raft of updates quickly in transient mode
@@ -347,9 +346,9 @@ around, which means:
 * Bindings to C libraries can be written in most languages.
 
 There's also a dash of perverse challenge in the language choice.  Is it
-possible to make (hybrid) persistent data structures that can hold their
-own performance-wise with raw array-based structures in C?  Not sure.
-We'll see.
+possible to make (on-demand) persistent data structures that can hold
+their own performance-wise with raw array-based structures in C?  Not
+sure.  We'll see.
 
 #### Allocation?
 

@@ -12,6 +12,8 @@
  *   arrays.
  *   - pro: Might improve cache use
  *   - cons: More complicated, especially for transient updates.
+ * - Make a more compact representation for short sequences.
+ *   - con: Might make the size of the basic structure dynamic
  */
 
 
@@ -20,15 +22,15 @@ typedef int value_t;
 
 typedef struct leaf_t leaf_t, *leaf_p;
 {
-    int length, refcount;
+    int refcount, length;
     value_t *values;
 }
 
 typedef struct branch_t branch_t, *branch_p;
 struct branch_t
 {
-    int degree, height, refcount;
     size_t size;
+    int refcount, degree, height;
     union
     {
         branch_p branches;
@@ -39,8 +41,8 @@ struct branch_t
 typedef struct vertebra_t vertebra_t, *vertebra_p;
 struct vertebra_t
 {
-    int height, refcount;
     size_t size;
+    int refcount, height;
     branch_p prefix, suffix;
 };
 
@@ -48,9 +50,9 @@ typedef struct finger_tree_root_t finger_tree_root_t, *finger_tree_root_p;
 struct finger_tree_root_t
 {
     size_t size;
-    int spine_length, refcount;
-    leaf_t prefix, suffix;
+    int refcount, spine_length;
     vertebra_p spine;
+    leaf_t prefix, suffix;
 };
 
 int lgmt_finger_tree_constr( finger_tree_root_p r )
@@ -64,31 +66,38 @@ int lgmt_finger_tree_constr( finger_tree_root_p r )
     return 0;
 }
 
-int lgmt_finger_tree_prepend(
-    finger_tree_root_p r_source, value_t v, finger_tree_root_p r )
+int lgmt_prepend2()
 {
-  /*  */
-    if( r != r_source )
-        *r = *r_source;
+}
+
+int lgmt_finger_tree_prepend(
+    finger_tree_root_p r_pre, value_t v, finger_tree_root_p r )
+{
+    /*  */
+    if( r != r_pre )
+        *r = *r_pre;
     r->refcount = 1;
-    if( r->prefix )
+    assert( r->prefix->length <= CHUNK_FACTOR );
+    if( r->prefix->length == CHUNK_FACTOR )
     {
-        assert( r->prefix->length > 0 );
-        assert( r->prefix->length <= CHUNK_FACTOR );
-        if( r->prefix->length == CHUNK_FACTOR )
+        if( r->spine_length == 0 )
         {
         }
         else
         {
-            
+            return lgmt_prepend2();
         }
     }
     else
     {
-        r->prefix.length = 1;
-        r->prefix.refcount = 1;
-        r->prefix.values = (value_t *)malloc( sizeof(r->prefix.values[0]) );
-        r->prefix.values[0] = v;
+        int new_len = r->prefix.length + 1;
+        r->prefix.refcount = 1; /* XXX? */
+        value_t *tmp = (value_t *)malloc( new_len * sizeof(tmp[0]) );
+        memcpy( &tmp[1], r->prefix.values, r->prefix.length * sizeof(tmp[0]) );
+        tmp[0] = v;
+        free( r->prefix.values ); /* XXX refcount? */
+        r->prefix.values = tmp;
+        r->prefix.length = new_len;
     }
     return 0;
 }

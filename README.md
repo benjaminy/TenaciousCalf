@@ -284,6 +284,9 @@ you do before converting back to persistent mode.  In the extreme,
 performing a single update in transient mode before converting back is
 almost identical (in performance) to just doing a persistent update.
 
+(If the refcount of the structure is 1, the update can just take
+ownership.)
+
 #### I smell monads.
 
 Transient mode is unsafe in the sense that you are not "allowed" to use

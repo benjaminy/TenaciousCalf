@@ -1,0 +1,38 @@
+Persistent Data Structures
+
+Abstract
+
+Persistent data structures are structures like lists, sets, maps and
+priority queues that have a curious property.  Every time a program
+modifies a persistent structure (for example, inserting "42" after the
+4th element in a list), it gets back both a new structure that reflects
+the update and the old pre-update structure.
+
+The naive way to implement persistent structures is make a full copy for
+every update.  This would be insanely inefficient in terms of both time
+and memory.  The first surprising thing about persistent structures is
+that they can be quite competitive with their conventional cousins: In
+many cases asymptotically equal; in the worst case logarithmically
+slower/bigger.
+
+In this talk I'll cover some classic examples of persistent structures,
+explain why they have been growing in popularity recently and discuss
+work that remains to be done.
+
+Outline:
+1. What?, part 1
+2. How?, part 1
+   - lists, trees (briefly)
+3. Why?, part 1
+   - Undo
+     - Firefox forget the last N minutes
+   - Parallel software
+   - Interactive software
+4. The bad news: high constant-factor overhead
+   - Tree with bytes
+5. B-trees
+6. Transience
+7. Hash-mapped array tries
+8. Remaining challenges
+   - Efficient implementations
+   - Verification

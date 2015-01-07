@@ -52,10 +52,10 @@ Persistent data structure def'n:
 A data structure is _persistent_ if updates create new versions without
 destroying previous versions.
 
-S1 = { "A", "B", "C" }
-S2 = add( S1, "D" )
-print S1
-print S2
+    S1 = { "A", "B", "C" }
+    S2 = add( S1, "D" )
+    print S1
+    print S2
 
 ## How?, part 1
 
@@ -73,19 +73,19 @@ a total non-starter for most applications.
 
 ## Why?
 
-1) Undo
+1. Undo
 
-In many applications the user performs a series of actions that modify
-the state of some document.  Undo is a common and extremely useful
-feature.  How can we implement undo?  Persistent data structures can
-make it quite simple.  Keep a list of all versions (or just the most
-recent N).  When the user asks to undo, just jump back.
+  In many applications the user performs a series of actions that modify
+  the state of some document.  Undo is a common and extremely useful
+  feature.  How can we implement undo?  Persistent data structures can
+  make it quite simple.  Keep a list of all versions (or just the most
+  recent N).  When the user asks to undo, just jump back.
 
-Example: Firefox retroactive private mode.
+  Example: Firefox retroactive private mode.
 
-2) Parallel software
+2. Parallel software
 
-3) Interactive software
+3. Interactive software
 
 ## The Bad News
 
@@ -114,5 +114,5 @@ Short arrays
 
 ## Time Efficiency: High branching factor
 
-log_32(1B) ~= 6
+log<sub>32</sub>(1B) &#2248; 6
 

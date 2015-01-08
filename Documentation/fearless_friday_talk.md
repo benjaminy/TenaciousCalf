@@ -195,7 +195,7 @@ Enter hash-mapped array tries!
 
 ### First lets talk about tries
 
-The name comes from re__trie__val, but most people ponounce it "try" to
+The name comes from re<strong>trie</strong>val, but most people ponounce it "try" to
 avoid confusion with "tree".
 
 Tries are special kinds of trees that efficiently store collections of

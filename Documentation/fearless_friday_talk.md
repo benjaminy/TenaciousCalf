@@ -195,11 +195,12 @@ Enter hash-mapped array tries!
 
 ### First lets talk about tries
 
-The name comes from re<strong>trie</strong>val, but most people ponounce it "try" to
-avoid confusion with "tree".
+The name comes from "re<strong>trie</strong>val", but most people
+ponounce it "try" to avoid confusion with "tree".
 
 Tries are special kinds of trees that efficiently store collections of
-data that have common prefixes.
+data that have common prefixes.  Here is a trie that represents the set
+{"CAT", "CAR", "CATCH", "DOG", "DODGE"}.
 
 ![alt text](../Images/simple_trie.png "Simple trie")
 

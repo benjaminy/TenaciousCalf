@@ -40,40 +40,67 @@ work that remains to be done.
 
 ## What? (part 1)
 
-- Data structures: lists, arrays, sets, key/value maps, priority queues.
-- Most implementations of these structures across the programming
-universe are _ephemeral_.  This means that a consequence of performing
-an update (like inserting a value into a set) is that the pre-update
-version of the structure no longer exists.
+Let's start with a na&iuml;ve question. In the following pseudocode,
+what do you expect will be printed?
+
+    X = 2
+    Y = X + 3
+    print X
+    print Y
+
+I hope it's pretty obvious that we should expect 2 and 5 to be printed.
+Now let's think about data that's a little more interesting: sets of
+numbers.  In this pseudocode, what do you expect will be printed?
+
+    S = { 2, 3, 4 }
+    T = insert( S, 7 )
+    print S
+    print T
+
+The second line might look unfamiliar to some.  In most popular
+programming langauges, we would expect to see something more like:
+
+    S.insert( 7 )
+
+In other words, the conventional way of thinking about data structures
+is that performing operations like insert or union or removing an
+element modifies the structure.  The previous state of the structure is
+gone.  To butcher Heraclitus, "No program ever steps in the same data
+structure twice, for it's not the same data and the state of the program
+is not the same."
+
+But data doesn't have to obey the physical laws of the world!  If you
+can't imagine a programming world where updating a data structure
+obliterates the previous state, I want to direct your attention to the
+first example.  We are all comfortable with the idea that performing an
+addition on numbers doesn't somehow erase the inputs to addition
+operation.
+
+This is what persistent data structures are all about: implemeting
+things like lists, arrays, sets, key/value maps, graphs, priority
+queues, in such a way that you can do all the normal operations like
+insertion, removal, sorting.  But these operations produce a new version
+of the structure without destroying or overwriting the previous version.
+One nice slogan for persistent data structures is _all data are values_.
 
 Persistent data structure def'n:
 
 > A data structure is _persistent_ if updates create new versions
 > without changing previous versions.
 
-    S1 = { "A", "B", "C" }
-    S2 = insert( S1, "D" )
-    print S1    # prints A, B, C
-    print S2    # prints A, B, C, D
-
-If this seems strange, consider if we replaced sets in this example with
-numbers:
-
-    N1 = 42
-    N2 = N1 + 17
-    print N1    # prints 42
-    print N2    # prints 59
-
-In many popular languages there is a small set of primitive data types
-(numbers, Booleans, strings in some cases) and everything else is
-handled through references by default.  One nice slogan for persistent
-data structures is _all data are values_.
-
 ## How? (part 1)
 
 The na&iuml;ve implementation of persistent data structures is to copy
-the entire structure for every update.  This is unacceptably memory
-inefficient for the vast majority of applications.
+the entire structure for every update.  For example,
+
+    S = { 2, 3, 4 }
+    T = copy( S )
+    T.insert( 7 )
+    print S
+    print T
+
+This is unacceptably memory inefficient for the vast majority of
+applications.
 
 We can do much better!  Hopefully this seems a little magical.  Here's a
 quick preview of how this is possible.
@@ -83,9 +110,10 @@ quick preview of how this is possible.
 ![alt text](../Images/simple_list2.png "Two lists!")
 
 This example leaves out lots of important details, but the crucial
-intuition is that after an update operation, most of the old version and
-the new version are the same.  The engineering of persistent data
-structures is all about taking advantage of this fact in clever ways.
+intuition is sharing of whatever is common between the two versions.
+The engineering of persistent data structures is all about finding the
+most efficient ways to exploit the commonalities between the pre- and
+post-updates states of the data.
 
 ## Why?
 
@@ -278,14 +306,14 @@ compute hash values for each object and use those as the keys.
 
 ![alt text](../Images/hash_trie.png "Hash trie")
 
-## Copying big nodes is no fun
+## Copying big nodes is no fun (Transience)
 
 Chunking and high-degree trees are generally a good idea, but there is
-tension with path copying.  Recall that each update to a tree-based
-persistent structure requires copying a (very) small number of paths
-from a leaf up to the root.  An array of 32 64-bit pointers is 256Bytes.
-In other words, 1/4 of a kB.  That's a non-trivial amount of data to be
-copying frequently.
+and engineering tension inherent in path copying.  Recall that each
+update to a tree-based persistent structure requires copying a (very)
+small number of paths from a leaf up to the root.  An array of 32 64-bit
+pointers is 256Bytes.  In other words, 1/4 of a kB.  That's a
+non-trivial amount of data to be copying frequently.
 
 "Transient" data structures to the rescue!  In many applications it's
 not necessary to save a version of the structure after every little

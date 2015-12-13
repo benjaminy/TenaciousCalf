@@ -24,7 +24,7 @@ Most software today uses mutable data structures.
 That is, aggregate data structures are defined by the memory they reside in and updates are made in-place (destroying the previous value of the structure).
 For example:
 
-  ```
+  ```python
   people = { "Alice", "Dave", "Mallory" }
   add_mutable( people, "Bob" )
   ```
@@ -33,14 +33,14 @@ Adding ``Bob`` to the set ``people`` causes the previous value of the set ({"Ali
 
 Using a persistent set data structure, the pseudocode would look like:
 
-  ```
+  ```python
   people1 = { "Alice", "Dave", "Mallory" }
   people2 = add_persistent( people1, "Bob" )
   ```
 
 For those unfamiliar with persistent data structures, you can think of it this way:
 
-  ```
+  ```python
   people1 = { "Alice", "Dave", "Mallory" }
   people2 = copy( people1 )
   add_mutable( people2, "Bob" )
@@ -61,7 +61,7 @@ In conventional persistent data structures, _every_ update creates a new copy.
 The application can discard the old copy if it wants to.
 For example:
 
-  ```
+  ```python
   people = { "Alice", "Dave", "Mallory" }
   people = add_persistent( people, "Bob" )
   ```
@@ -83,8 +83,8 @@ So application writers are encouraged to use patterns like this:
   ```
 
 In the above code the procedure interface is effectively persistent.
-addSomePeople returns a new set without modifying the one passed in my the caller.
-Internally addSomePeople avoids the overhead of making copies for each individual update.
+``addSomePeople`` returns a new set without modifying the one passed in my the caller.
+Internally ``addSomePeople`` avoids the overhead of making copies for each individual update.
 We believe that the majority of the software engineering benefit of persistent data structures occurs at this kind of coarser granularity.
 
 Persistent data structures have been studied for decades, but had little impact on mainstream software development recently.

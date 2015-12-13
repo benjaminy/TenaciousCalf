@@ -29,7 +29,7 @@ For example:
   add_mutable( people, "Bob" )
   ```
 
-Adding ``Bob`` to the set ``people`` causes the previous value of the set ({"Alice", "Dave", "Mallory"}) to go away.
+Adding ``Bob`` to the set ``people`` causes the previous value of the set (``{"Alice", "Dave", "Mallory"}``) to go away.
 
 Using a persistent set data structure, the pseudocode would look like:
 
@@ -52,7 +52,7 @@ If you have some familiarity with how version control works, you can think of th
 
 [Click here for a little exposition on the benefits of persistence](/Documentation/benefits_of_persistence.md).
 
-(Little terminology note: The database community uses _persistent_ in a completely different way.
+(Little terminology note: _Persistent_ means something completely different in the context of databases.
 Persistent data structures don't have anything to do with saving to secondary storage.)
 
 ### Application-controlled copying
@@ -69,7 +69,7 @@ For example:
 But under the hood there is still a small amount of copying and discarding going on here, not just updating the structure in-place.
 Even with very sophisticated allocators and garbage collectors, this creates a non-trivial amount of overhead for some applications.
 
-One of the two interesting features of the structures in the TC library is that update procedures are mutable, but copying is extremely cheap.
+One of the two interesting features of the structures in the TC library is that update procedures are mutating, but copying is extremely cheap.
 So application writers are encouraged to use patterns like this:
 
   ```python
@@ -87,28 +87,19 @@ In the above code the procedure interface is effectively persistent.
 Internally ``addSomePeople`` avoids the overhead of making copies for each individual update.
 We believe that the majority of the software engineering benefit of persistent data structures occurs at this kind of coarser granularity.
 
-Persistent data structures have been studied for decades, but had little impact on mainstream software development recently.
-The principal reasons for the changing tide are:
+### Chunking
 
+Persistent data structures are necessarily full of pointers.
+In order to make copying cheap, it is necessary for the data structure to be broken up into small (or small-ish) blocks of memory that are linked together in some way.
+Textbook implementations of persistent structures like binary search trees are _very_ pointer-heavy.
+This has two related but distinct negative effects on performance:
 
-Researchers have done amazing work discovering persistent data structures that match (or come close to) their transient cousins in terms of asymptotics.
-Unfortunately, textbook persistent structures typically have very high constant-factor overhead compared to their mutable cousins.
-The reasons for this overhead are:
-
-* Persistent data tend to be pointer-heavy.
-  This is essential, not incidental.
-  Large persistent structures must be split up into relatively small objects to keep the cost of persistent updates down to a dull roar.
-  This has two related but distinct consequences:
-  * Application data density in persistent structures is low; in some cases _very_ low.
-    Application data density matters a lot, because it has a direct impact on how efficiently an application uses every level of the memory hierarchy, from L1 cache to secondary storage paging.
-  * It typically takes a least a few sequentially-dependent memory loads to get to the data your application is interested in.
-    Each of these loads is an opportunity to miss at each level of the memory hierarchy, and cache misses are terrible for performance.
-    Also, because the accesses are sequentially dependent, it is not possible to pipeline them.
-    Modern processor architectures love pipelining.
-* Every update to persistent data involves copying a small handful of objects.
-  * This work is totally unnecessary for mutable structures.
-  * It is a fairly expensive kind of work: allocating and freeing lots of small-ish objects.
-    (Yes, this overhead can be kept impressively low with very fancy allocators and garbage collectors, but it cannot be eliminated.)
+* Application data density in persistent structures is low; in some cases _very_ low.
+  Application data density matters a lot, because it has a direct impact on how efficiently an application uses every level of the memory hierarchy, from L1 cache to secondary storage paging.
+* It typically takes at least a few sequentially-dependent memory loads to get to the data your application is interested in.
+  Each of these loads is an opportunity to miss at each level of the memory hierarchy, and cache misses are terrible for performance.
+  Also, because the accesses are sequentially dependent, it is not possible to pipeline them.
+  Modern processor architectures love pipelining.
 
 [A cute little microbenchmarking exercise that illustrates the importance of data density and pointer chasing](/Documentation/linked_list.md).
 
@@ -132,19 +123,6 @@ The two main techniques used to achieve high performance are:
   Structures that exemplify this strategy are B-trees and hash array mapped tries.
   Chunking improves data density and reduces the amount of pointer chasing.
 
-* _Application-controlled copying_.
-  Instead of making a new copy of the structure, we leave it up to application code to choose when to update mutably and when to copy.
-  The copying is done lazily (i.e. copy-on-write at the level of individual internal nodes in the data structure).
-
-Application-controlled persistence enables the following pattern:
-
-1. Make a local transient copy of a data structure
-2. Perform a raft of updates mutably (i.e. very quickly)
-3. Make another clean copy and share it with the rest of the application
-
-This pattern mostly preserves the software engineering benefits of pure persistence, and brings substantial performance benefits.
-As far as I know, Rich Hickey pioneered this use of transience (I'd love to hear about prior work).
-You can read his thoughts on the matter here: http://clojure.org/transients.
 
 These two features (chunking and application-controlled copying) have strong synergy.
 Chunking tends to improve read performance by prefetching nearby data (i.e. exploiting spatial locality) and reducing the number of pointer hops, but it hurts write performance because copying chunks is more expensive than copying very small nodes.

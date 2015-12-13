@@ -29,7 +29,7 @@ For example:
   add_mutable( people, "Bob" )
   ```
 
-Adding ``Bob`` to the set "people" causes the previous value of the set ({"Alice", "Dave", "Mallory"}) to go away.
+Adding ``Bob`` to the set ``people`` causes the previous value of the set ({"Alice", "Dave", "Mallory"}) to go away.
 
 Using a persistent set data structure, the pseudocode would look like:
 
@@ -38,7 +38,7 @@ Using a persistent set data structure, the pseudocode would look like:
   people2 = add_persistent( people1, "Bob" )
   ```
 
-For people unfamiliar with persistent data structures, you can think of it this way:
+For those unfamiliar with persistent data structures, you can think of it this way:
 
   ```
   people1 = { "Alice", "Dave", "Mallory" }
@@ -50,7 +50,7 @@ That is, every update to a purely persistent structure makes a copy, then change
 This copying is amazingly cheap, because the data is broken up into small pieces in clever ways, and the majority of the "old" structure and the "new" structure are _shared_.
 If you have some familiarity with how version control works, you can think of that as a first approximation of what's going on with persistent data structures.
 
-[Click here for a little exposition on the benefits of persistence.](/Documentation/benefits_of_persistence.md).
+[Click here for a little exposition on the benefits of persistence](/Documentation/benefits_of_persistence.md).
 
 (Little terminology note: The database community uses _persistent_ in a completely different way.
 Persistent data structures don't have anything to do with saving to secondary storage.)
@@ -69,11 +69,11 @@ For example:
 But under the hood there is still a small amount of copying and discarding going on here, not just updating the structure in-place.
 Even with very sophisticated allocators and garbage collectors, this creates a non-trivial amount of overhead for some applications.
 
-One of the two interesting features of the structures the TC library is that update procedures are mutable, but copying is extremely cheap.
+One of the two interesting features of the structures in the TC library is that update procedures are mutable, but copying is extremely cheap.
 So application writers are encouraged to use patterns like this:
 
   ```
-  def addSomePeople( people ):
+  **def** addSomePeople( people ):
     people2 = copy( people )
     add_mutable( people2, "Eve" )
     add_mutable( people2, "Bob" )

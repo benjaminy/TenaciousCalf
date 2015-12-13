@@ -73,7 +73,7 @@ One of the two interesting features of the structures in the TC library is that 
 So application writers are encouraged to use patterns like this:
 
   ```
-  **def** addSomePeople( people ):
+  <strong>def</strong> addSomePeople( people ):
     people2 = copy( people )
     add_mutable( people2, "Eve" )
     add_mutable( people2, "Bob" )

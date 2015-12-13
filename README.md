@@ -72,8 +72,8 @@ Even with very sophisticated allocators and garbage collectors, this creates a n
 One of the two interesting features of the structures in the TC library is that update procedures are mutable, but copying is extremely cheap.
 So application writers are encouraged to use patterns like this:
 
-  ```
-  <strong>def</strong> addSomePeople( people ):
+  ```python
+  def addSomePeople( people ):
     people2 = copy( people )
     add_mutable( people2, "Eve" )
     add_mutable( people2, "Bob" )

@@ -1,144 +1,159 @@
-# Ligament
+# Tenacious Calf
 
-Chunky, On-Demand Persistent Data Structures
+Fine-Grained Copy-On-Write Data Structures
 
 ---
 
-_First they ignore you.  Then they ridicule you.  And then they attack
-you and want to burn you.  And then they build monuments to you.  And
-that, is what is going to happen to the functional style of
-programming._
+_First they ignore you.
+Then they ridicule you.
+And then they attack you and want to burn you.
+And then they build monuments to you.
+And that, is what is going to happen to the functional style of programming._
 
 (Apologies to the ghost of Nicholas Klein.)
 
-[TL;DR: This project is an experiment in making persistent data
-structures that can compete with their transient/mutable cousins in
-terms of asymptotic _and_ constant-factor performance.  The main
-techniques used to get there are chunking to improve memory efficiency
-and on-demand persistence/transience to reduce copying overhead.]
+[TL;DR: This project is an experiment in making extremely efficient persistent data structures, in terms of both memory and time.
+In particular the goal is structures with very small constant-factor performance overhead relative to their mutable cousins.
+The main techniques used to get there are giving application code the ability to make either persistent or mutable updates (to minimize copying overhead), and chunking (to minimize memory overhead).]
 
-Persistent data structures have been studied for decades, but had little
-impact on the lives of most working programmers until recently.  The
-principal reasons for the changing tide are:
+[What's with the name?](/Documentation/whats_in_a_name.md)
 
-* Mainstream applications are increasingly interactive compared to their
-  forebears (network communication, UI, physical controls, etc).
-  Interactivity is directly related to complex dynamic internal
-  dependencies, and persistent data makes it less likely that a change
-  made in one corner of a large application will have unintended
-  consequences somewhere else down the road.
-* Parallel processors have gone mainstream.  Persistent data makes it
-  easier to write parallel software without going insane in the pit of
-  data races, deadlocks and atomicity violations.
+### Lightning Introduction to Persistent Data Structures
 
-Of course persistent structures have always had other cool tricks up
-their sleeve:
+Most software today uses mutable data structures.
+That is, aggregate data structures are defined by the memory they reside in and updates are made in-place (destroying the previous value of the structure).
+For example:
 
-* They simplify the implementation of undo functionality
-* They simplify the implementation of backtracking algorithms and
-  "what-if" analysis
-* They generally have better asymptotics than their transient cousins
-  for fancy operations like concatenation and slicing
-* &hellip;
+  ```
+  people = { "Alice", "Dave", "Mallory" }
+  add_mutable( people, "Bob" )
+  ```
 
-If you're not familiar with persistent data structures, Rich Hickey has
-some great introduction presentations up on youtube and infoq.
+Adding ``Bob`` to the set "people" causes the previous value of the set ({"Alice", "Dave", "Mallory"}) to go away.
 
-Researchers have done amazing work discovering persistent data
-structures that match (or come close to) their transient cousins in
-terms of asymptotics.  Unfortunately, textbook persistent structures
-typically have very high constant-factor overhead compared to the
-aforementioned cousins.  The reasons for this overhead are:
+Using a persistent set data structure, the pseudocode would look like:
 
-* Persistent data tend to be pointer-heavy.  This is essential, not
-  incidental.  Large persistent structures must be split up into
-  relatively small objects to keep the cost of persistent updates down
-  to a dull roar.  This has two related but distinct consequences:
-  * Application data density in persistent structures is low; in some
-    cases _very_ low.  Application data density matters a lot, because
-    it has a direct impact on how efficiently an application uses every
-    level of the memory hierarchy, from L1 cache to secondary storage
-    paging.
-  * It typically takes a least a few sequentially-dependent memory loads
-    to get to the data your application is interested in.  Each of these
-    loads is an opportunity to miss at each level of the memory
-    hierarchy, and cache misses are terrible for performance.  Also,
-    because the accesses are sequentially dependent, it is not possible
-    to pipeline them.  Modern architectures love pipelining.
-* Every update to persistent data involves copying a small handful of
-  objects.
-  * This work is totally unnecessary for mutable data.
-  * It is a fairly expensive kind of work: allocating and freeing lots
-    of small-ish objects.
+  ```
+  people1 = { "Alice", "Dave", "Mallory" }
+  people2 = add_persistent( people1, "Bob" )
+  ```
 
-[A cute little microbenchmarking exercise that illustrates the
-importance of data density and pointer
-chasing](/Documentation/linked_list.md).
+For people unfamiliar with persistent data structures, you can think of it this way:
 
-How bad are these performance costs?  It's hard to give a simple answer
-to general performance questions like that, but it's not at all hard to
-cook up a microbenchmark that shows well-implemented textbook persistent
-structures performing 10&times; slower than array-based cousins.
+  ```
+  people1 = { "Alice", "Dave", "Mallory" }
+  people2 = copy( people1 )
+  add_mutable( people2, "Bob" )
+  ```
+
+That is, every update to a purely persistent structure makes a copy, then changes the copy.
+This copying is amazingly cheap, because the data is broken up into small pieces in clever ways, and the majority of the "old" structure and the "new" structure are _shared_.
+If you have some familiarity with how version control works, you can think of that as a first approximation of what's going on with persistent data structures.
+
+[Click here for a little exposition on the benefits of persistence.](/Documentation/benefits_of_persistence.md).
+
+(Little terminology note: The database community uses _persistent_ in a completely different way.
+Persistent data structures don't have anything to do with saving to secondary storage.)
+
+### Application-controlled copying
+
+In conventional persistent data structures, _every_ update creates a new copy.
+The application can discard the old copy if it wants to.
+For example:
+
+  ```
+  people = { "Alice", "Dave", "Mallory" }
+  people = add_persistent( people, "Bob" )
+  ```
+
+But under the hood there is still a small amount of copying and discarding going on here, not just updating the structure in-place.
+Even with very sophisticated allocators and garbage collectors, this creates a non-trivial amount of overhead for some applications.
+
+One of the two interesting features of the structures the TC library is that update procedures are mutable, but copying is extremely cheap.
+So application writers are encouraged to use patterns like this:
+
+  ```
+  def addSomePeople( people ):
+    people2 = copy( people )
+    add_mutable( people2, "Eve" )
+    add_mutable( people2, "Bob" )
+    add_mutable( people2, "Carol" )
+    ...
+    return people2
+  ```
+
+In the above code the procedure interface is effectively persistent.
+addSomePeople returns a new set without modifying the one passed in my the caller.
+Internally addSomePeople avoids the overhead of making copies for each individual update.
+We believe that the majority of the software engineering benefit of persistent data structures occurs at this kind of coarser granularity.
+
+Persistent data structures have been studied for decades, but had little impact on mainstream software development recently.
+The principal reasons for the changing tide are:
+
+
+Researchers have done amazing work discovering persistent data structures that match (or come close to) their transient cousins in terms of asymptotics.
+Unfortunately, textbook persistent structures typically have very high constant-factor overhead compared to their mutable cousins.
+The reasons for this overhead are:
+
+* Persistent data tend to be pointer-heavy.
+  This is essential, not incidental.
+  Large persistent structures must be split up into relatively small objects to keep the cost of persistent updates down to a dull roar.
+  This has two related but distinct consequences:
+  * Application data density in persistent structures is low; in some cases _very_ low.
+    Application data density matters a lot, because it has a direct impact on how efficiently an application uses every level of the memory hierarchy, from L1 cache to secondary storage paging.
+  * It typically takes a least a few sequentially-dependent memory loads to get to the data your application is interested in.
+    Each of these loads is an opportunity to miss at each level of the memory hierarchy, and cache misses are terrible for performance.
+    Also, because the accesses are sequentially dependent, it is not possible to pipeline them.
+    Modern processor architectures love pipelining.
+* Every update to persistent data involves copying a small handful of objects.
+  * This work is totally unnecessary for mutable structures.
+  * It is a fairly expensive kind of work: allocating and freeing lots of small-ish objects.
+    (Yes, this overhead can be kept impressively low with very fancy allocators and garbage collectors, but it cannot be eliminated.)
+
+[A cute little microbenchmarking exercise that illustrates the importance of data density and pointer chasing](/Documentation/linked_list.md).
+
+How bad are these performance costs?
+It's hard to give a simple answer to general performance questions like that, but it's not at all hard to cook up a microbenchmark that shows well-implemented textbook persistent structures performing 10&times; slower than array-based cousins.
 Two caveats:
 
-* This is not an apples-to-apples comparison.  Persistent data gives
-  your software the superpower of using multiple versions of a structure
-  simultaneously; mutable data can't do that.
-* As with any microbenchmarking, the impact on application performance
-  will be diluted by all the other stuff that your application does.
+* This is not an apples-to-apples comparison.
+  Persistent data gives software the superpower of using multiple versions of a structure simultaneously; mutable structures can't do that.
+* As with any microbenchmarking, the impact on application performance will be diluted by all the other stuff that the application does.
 
-Caveats notwithstanding, the performance overhead of these structures is
-high enough to be a real liability for lots of applications.  (Of course
-the details matter a lot.  "Persistent data structures are fast enough"
-and "Persistent structures are too slow" are both laughably simplistic
-slogans.)  This project is an attempt to spread the use of persistence
-by implementing high-performance persistent collections like sets,
-vectors, maps and graphs in C.  The two main techniques used to achieve
-high performance are:
+Caveats notwithstanding, the performance overhead of these structures is high enough to be a real liability for lots of applications.
+(Of course the details matter a lot.
+"Persistent data structures are fast enough" and "Persistent structures are too slow" are both laughably simplistic slogans.)
+This project is an attempt to spread the use of persistence by implementing high-performance persistent collections like sets, vectors, maps and graphs in C.
+The two main techniques used to achieve high performance are:
 
-* _Chunking_.  Textbook persistent data structures have lots of very
-  small nodes.  Chunking is the strategy of grouping together a small
-  number of "nearby" nodes into a modestly-sized raw array (or similarly
-  efficient encoding).  Structures that exemplify this strategy are
-  B-trees and hash array mapped tries.  Chunking improves data density
-  and reduces the amount of pointer chasing.
+* _Chunking_.
+  Textbook persistent data structures have lots of very small nodes.
+  Chunking is the strategy of grouping together a small number of "nearby" nodes into a modestly-sized raw array (or similarly efficient encoding).
+  Structures that exemplify this strategy are B-trees and hash array mapped tries.
+  Chunking improves data density and reduces the amount of pointer chasing.
 
-* _On-demand persistence_.  The structures in this library are not
-  purely persistent, but rather on-demand persistent/transient.
-  Application code chooses whether each update should be persistent or
-  transient (i.e. destructive/mutable).  Performing a transient update
-  after a persistent update logically makes a transient-mode clone of
-  the whole structure.  Luckily might sound expensive, but it can be
-  made very cheap by tagging nodes as persistent/transient and
-  performing the copying lazily.
+* _Application-controlled copying_.
+  Instead of making a new copy of the structure, we leave it up to application code to choose when to update mutably and when to copy.
+  The copying is done lazily (i.e. copy-on-write at the level of individual internal nodes in the data structure).
 
-On-demand persistence allows applications to use the following pattern:
+Application-controlled persistence enables the following pattern:
 
 1. Make a local transient copy of a data structure
-2. Perform a raft of updates quickly in transient mode
-3. Make the structure persistent again and share it with the rest of the
-application
+2. Perform a raft of updates mutably (i.e. very quickly)
+3. Make another clean copy and share it with the rest of the application
 
-This pattern mostly preserves the software engineering benefits of pure
-persistence, and brings substantial performance benefits.  As far as I
-know, Rich Hickey pioneered this use of transience (I'd love to hear
-about prior work).  You can read his thoughts on the matter here:
-http://clojure.org/transients.
+This pattern mostly preserves the software engineering benefits of pure persistence, and brings substantial performance benefits.
+As far as I know, Rich Hickey pioneered this use of transience (I'd love to hear about prior work).
+You can read his thoughts on the matter here: http://clojure.org/transients.
 
-These two features (chunking and transience) have fairly strong synergy.
-Chunking tends to improve read performance by prefetching nearby data
-(i.e. exploiting spatial locality) and reducing the number of pointer
-hops, but it hurts write performance because copying chunks is more
-expensive than copying very small nodes.  Transience dramatically
-reduces the number of node copies needed.  So if an application can
-arrange to do most of its updates in transient mode bursts, it can get
-the best of both worlds.
+These two features (chunking and application-controlled copying) have strong synergy.
+Chunking tends to improve read performance by prefetching nearby data (i.e. exploiting spatial locality) and reducing the number of pointer hops, but it hurts write performance because copying chunks is more expensive than copying very small nodes.
+Transience dramatically reduces the number of node copies needed.
+So if an application can arrange to do most of its updates in mutable bursts, it can get the best of both worlds.
 
-_A note to functional programming enthusiasts_: transient updates return
-a root that may or may not refer to the same memory as the root before
-the update.  After the update the "old" root can no longer be used
-safely.  Various kinds of static and dynamic checking can help ensure
-that programs don't violate this rule, but it is a potential pitfall.
+_A note to functional programming enthusiasts_: transient updates return a root that may or may not refer to the same memory as the root before the update.
+After the update the "old" root can no longer be used safely.
+Various kinds of static and dynamic checking can help ensure that programs don't violate this rule, but it is a potential pitfall.
 
 ## Here are the parameters of the project in Q&amp;A format:
 

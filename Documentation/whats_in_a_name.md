@@ -1,6 +1,7 @@
-Hopy a loose acronymization of "Hybrid Persistent".  It's easy to find
-with keyword search, which is convenient.  It is pronounced like the
-American Indian name Hopi.
+The data structures in this library are in persistent/functional/immutable family.
+"Tenacious" is a play on "persistent", because the Tenacious Calf (TC) structures are a little different from the most common kind of persistent structures.
+Copy-on-write is an important part of how the TC structures work.
+Copy-on-write is sometimes abbreviated "COW", and the TC structures apply the concept in a smaller/more fine-grained way that is common; therefore "calf".
 
 #### Why are you using "multi-version"? I prefer X.
 

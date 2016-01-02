@@ -136,7 +136,7 @@ int cow_trie_lookup(
 }
 
 
-int cow_trie_insert(cow_trie_p map, key_t key, val_t val, int level, cow_trie_p *res) {
+int cow_trie_insert(cow_trie_p map, key_t key, val_t val, cow_trie_p *res) {
     int rc = 0;
     int virtual_idx = key & LOW_BITS_MASK;
     uint32_t bitmask_loc = 1 << virtual_idx;
@@ -150,14 +150,13 @@ int cow_trie_insert(cow_trie_p map, key_t key, val_t val, int level, cow_trie_p 
         if (n->ref_count > 1) {
             cow_trie_p child_copy = cow_trie_copy_node(n);
             --n->ref_count;
-            return cow_trie_insert(child_copy, key >> BITS_PER_LVL, val, level+1, &child_copy);
+            return cow_trie_insert(child_copy, key >> BITS_PER_LVL, val, &child_copy);
         }
         else {
-            return cow_trie_insert(n, key >> BITS_PER_LVL, val, level+1, &n);
+            return cow_trie_insert(n, key >> BITS_PER_LVL, val, &n);
         }
     }
     else if (bitmask_loc & map->value_bitmap) {
-        
         int physical_idx        = count_one_bits(map->value_bitmap & bitmask_lower);
         cow_trie_p child        = cow_trie_alloc(0, 1);
         child->ref_count        = 1;
@@ -168,7 +167,7 @@ int cow_trie_insert(cow_trie_p map, key_t key, val_t val, int level, cow_trie_p 
         child_vks[0].key_frag   = vks[physical_idx].key_frag >> BITS_PER_LVL;
         child->value_bitmap     = 1 << child_vks[0].key_frag;
         cow_trie_p n            = cow_trie_alloc(child_count+1, value_count);
-        n->value_bitmap         = map->value_bitmap | ~bitmask_loc;
+        n->value_bitmap         = map->value_bitmap ^ bitmask_loc;
         n->child_bitmap         = map->child_bitmap | bitmask_loc;
         int c_physical_idx      = count_one_bits(map->child_bitmap & bitmask_lower);
         cow_trie_p* new_children  = cow_trie_children(n);
@@ -177,11 +176,10 @@ int cow_trie_insert(cow_trie_p map, key_t key, val_t val, int level, cow_trie_p 
         memcpy(new_children + (c_physical_idx + 1) * sizeof(cow_trie_p),
                cow_trie_children(map) + c_physical_idx * sizeof(cow_trie_p),
                (child_count - c_physical_idx) * sizeof(cow_trie_p));
-        rc = cow_trie_insert(child, key >> BITS_PER_LVL, val, level + 1, &child);
+        rc = cow_trie_insert(child, key >> BITS_PER_LVL, val, &child);
         new_children[c_physical_idx] = child;
         *res = n;
         return 1;
-        
     }
     else {
         int physical_idx = count_one_bits(map->value_bitmap & bitmask_lower);
@@ -209,9 +207,10 @@ int main( int argc, char **argv )
     cow_trie_p f = cow_trie_alloc(0, 0);
     f->child_bitmap = 0;
     f->value_bitmap = 0;
-    cow_trie_insert(f, 5, 10, 1, &f);
+    cow_trie_insert(f, 5, 10, &f);
     uint32_t q = 0;
-    cow_trie_insert(f, 37, 10, 1, &f);
+    cow_trie_insert(f, 37, 10, &f);
     cow_trie_lookup(f, 37, 1, &q);
     printf("value is %d", q);
+    fflush(stdout);
 }

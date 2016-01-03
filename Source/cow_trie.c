@@ -127,7 +127,7 @@ int cow_trie_lookup(
     {
         int physical_idx = count_one_bits( map->child_bitmap & bitmask_lower );
         return cow_trie_lookup(
-            map, key, level, v );
+            cow_trie_children(map)[physical_idx], key >> BITS_PER_LVL, level, v );
     }
     else
     {

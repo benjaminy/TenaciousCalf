@@ -110,12 +110,18 @@ static val_t cow_deref_val( cow_trie_p map, int ccount, int vidx )
 
 
 int cow_trie_lookup(
-    cow_trie_p map, key_t key, int level, val_t *v )
+    cow_trie_p map, key_t key, val_t *v )
 {
     int        virtual_idx = key & LOW_BITS_MASK;
     uint32_t   bitmask_loc = 1 << virtual_idx;
-    uint32_t bitmask_lower = ( ~0U ) >> ( LVL_CAPACITY - virtual_idx );
-
+    uint32_t bitmask_lower;
+    int shift_amt = LVL_CAPACITY - virtual_idx;
+    if (shift_amt != 32) {
+        bitmask_lower = ( ~0U ) >> ( LVL_CAPACITY - virtual_idx );
+    }
+    else {
+        bitmask_lower = 0;
+    }
     if( bitmask_loc & map->value_bitmap )
     {
         int child_count  = count_one_bits( map->child_bitmap );
@@ -127,7 +133,7 @@ int cow_trie_lookup(
     {
         int physical_idx = count_one_bits( map->child_bitmap & bitmask_lower );
         return cow_trie_lookup(
-            cow_trie_children(map)[physical_idx], key >> BITS_PER_LVL, level, v );
+            cow_trie_children(map)[physical_idx], key >> BITS_PER_LVL, v );
     }
     else
     {
@@ -140,7 +146,14 @@ int cow_trie_insert(cow_trie_p map, key_t key, val_t val, cow_trie_p *res) {
     int rc = 0;
     int virtual_idx = key & LOW_BITS_MASK;
     uint32_t bitmask_loc = 1 << virtual_idx;
-    uint32_t bitmask_lower = (~0U) >> (LVL_CAPACITY - virtual_idx);
+    uint32_t bitmask_lower;
+    int shift_amt = LVL_CAPACITY - virtual_idx;
+    if (shift_amt != 32) {
+        bitmask_lower = ( ~0U ) >> ( LVL_CAPACITY - virtual_idx );
+    }
+    else {
+        bitmask_lower = 0;
+    }
     int child_count = count_one_bits(map->child_bitmap);
     int value_count = count_one_bits(map->value_bitmap);
     
@@ -209,8 +222,10 @@ int main( int argc, char **argv )
     f->value_bitmap = 0;
     cow_trie_insert(f, 5, 10, &f);
     uint32_t q = 0;
-    cow_trie_insert(f, 37, 10, &f);
-    cow_trie_lookup(f, 37, 1, &q);
+    cow_trie_insert(f, 37, 14, &f);
+    cow_trie_p abc = cow_trie_copy_node(f);
+    cow_trie_insert(abc, 501472, 123, &abc);
+    cow_trie_lookup(abc, 501472, &q);
     printf("value is %d", q);
     fflush(stdout);
 }

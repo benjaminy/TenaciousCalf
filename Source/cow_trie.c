@@ -28,15 +28,6 @@ struct val_key_t
     val_t val;
 };
 
-/* TODO: Think about the trade-off between putting the meta-information
- * with the node itself (as it is now) versus pulling it up to the
- * parent.  Storing the meta-information with the parent might be better
- * for locality.  However, in a persistent world there can be multiple
- * references to a single node.  It's not clear where the
- * meta-information should be in that case (multiple copies?  Seems
- * ugly.)
- */
-
 /* Using the variable-sized struct trick.  There are actually two
  * arrays:
  * - cow_trie_next_p children[ child_n ]
@@ -117,7 +108,7 @@ int cow_trie_lookup(
     uint32_t bitmask_lower;
     int shift_amt = LVL_CAPACITY - virtual_idx;
     if (shift_amt != 32) {
-        bitmask_lower = ( ~0U ) >> ( LVL_CAPACITY - virtual_idx );
+        bitmask_lower = ( ~0U ) >> ( shift_amt );
     }
     else {
         bitmask_lower = 0;
@@ -149,7 +140,7 @@ int cow_trie_insert(cow_trie_p map, key_t key, val_t val, cow_trie_p *res) {
     uint32_t bitmask_lower;
     int shift_amt = LVL_CAPACITY - virtual_idx;
     if (shift_amt != 32) {
-        bitmask_lower = ( ~0U ) >> ( LVL_CAPACITY - virtual_idx );
+        bitmask_lower = ( ~0U ) >> ( shift_amt );
     }
     else {
         bitmask_lower = 0;
@@ -227,5 +218,4 @@ int main( int argc, char **argv )
     cow_trie_insert(abc, 501472, 123, &abc);
     cow_trie_lookup(abc, 501472, &q);
     printf("value is %d", q);
-    fflush(stdout);
 }

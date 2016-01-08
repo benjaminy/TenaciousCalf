@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+#include "graph.c"
 
 static int count_one_bits( uint32_t bits )
 {
@@ -38,7 +39,7 @@ typedef struct cow_trie_t cow_trie_t, *cow_trie_p;
     int             ref_count;
     uint32_t        child_bitmap, value_bitmap;
     char            _[0];
-};
+};te
 
 static cow_trie_p *cow_trie_children( cow_trie_p m )
 {
@@ -51,21 +52,23 @@ static val_key_p cow_trie_values( cow_trie_p m )
     return (val_key_p)&( ( cow_trie_children( m ) )[ child_count ] );
 }
 
-const uint32_t LOW_BITS_MASK = 0x1f;
-const int      BITS_PER_LVL = 5;
-const int      LVL_CAPACITY = 1 << ( BITS_PER_LVL );
+const int      CHILD_ARRAY_BUFFER_SIZE = 0;
+const int      VALUE_ARRAY_BUFFER_SIZE = 0;
+const uint32_t           LOW_BITS_MASK = 0x1f;
+const int                 BITS_PER_LVL = 5;
+const int                 LVL_CAPACITY = 1 << ( BITS_PER_LVL );
 
 cow_trie_p cow_trie_alloc( int children, int values )
 {
     return (cow_trie_p)malloc(
-        sizeof( cow_trie_t ) + children * sizeof( cow_trie_p )
-        + values * sizeof(val_key_t));
+        sizeof( cow_trie_t ) + (children + CHILD_ARRAY_BUFFER_SIZE) * sizeof( cow_trie_p )
+        + (values + VALUE_ARRAY_BUFFER_SIZE) * sizeof(val_key_t));
 }
 
 cow_trie_p cow_trie_clone_node( cow_trie_p map, int children, int values )
 {
     cow_trie_p m = malloc(
-        sizeof( m[0] ) + children * sizeof( cow_trie_p )
+               sizeof( m[0] ) + children * sizeof( cow_trie_p )
         + values * sizeof( val_key_t ) );
     if( m )
     {
@@ -170,6 +173,7 @@ int cow_trie_insert(cow_trie_p map, key_t key, val_t val, cow_trie_p *res) {
         child_vks[0].val        = vks[physical_idx].val;
         child_vks[0].key_frag   = vks[physical_idx].key_frag >> BITS_PER_LVL;
         child->value_bitmap     = 1 << child_vks[0].key_frag;
+        //if the child array is full
         cow_trie_p n            = cow_trie_alloc(child_count+1, value_count);
         n->value_bitmap         = map->value_bitmap ^ bitmask_loc;
         n->child_bitmap         = map->child_bitmap | bitmask_loc;
@@ -187,6 +191,7 @@ int cow_trie_insert(cow_trie_p map, key_t key, val_t val, cow_trie_p *res) {
     }
     else {
         int physical_idx = count_one_bits(map->value_bitmap & bitmask_lower);
+        //if the value array is full
         cow_trie_p n = cow_trie_alloc(child_count, value_count+1);
         n->value_bitmap = map->value_bitmap | bitmask_loc;
         n->child_bitmap = map->child_bitmap;

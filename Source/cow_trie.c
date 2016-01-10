@@ -184,6 +184,104 @@ int cow_trie_lookup(
     }
 }
 
+int move_stuff_around(cow_trie_p map, int child_count, int value_count, uint32_t bitmask_loc,
+                     cow_trie_p child, int v_physical_idx, int c_physical_idx) {
+    uint32_t val_size = sizeof(val_t);
+    uint32_t ptr_size = sizeof(cow_trie_p);
+    int vals_greater = val_size > ptr_size;
+    //9 cases
+    //beginning of values array, end of child array
+    if (v_physical_idx == 0 && c_physical_idx == child_count) {
+        if (vals_greater) {
+            cow_trie_children(map)[c_physical_idx] = child;
+            map->child_bitmap = map->child_bitmap | bitmask_loc;
+            memmove(cow_trie_values(map), cow_trie_values(map) + val_size - ptr_size, value_count * val_size);
+        }
+        else {
+            memmove(cow_trie_values(map) + ptr_size, cow_trie_values(map) + val_size, value_count * val_size);
+            cow_trie_children(map)[c_physical_idx] = child;
+            map->child_bitmap = map->child_bitmap | bitmask_loc;
+        }
+    }
+    //middle of values array, end of child array
+    //could these be faster?
+    if (v_physical_idx > 0 && v_physical_idx < value_count && c_physical_idx == child_count) {
+        if (vals_greater) {
+            memmove(cow_trie_values(map)[1], cow_trie_values(map)[0],
+                    val_size * v_physical_idx);
+            cow_trie_children(map)[c_physical_idx] = child;
+            map->child_bitmap = map->child_bitmap | bitmask_loc;
+            memmove(cow_trie_values(map), cow_trie_values(map) + (val_size - ptr_size), value_count * val_size);
+        }
+        else {
+            memmove(cow_trie_values(map)[1], cow_trie_values(map[0],
+                    val_size * v_physical_idx);
+            map->child_bitmap = map->child_bitmap | bitmask_loc;
+            memmove(cow_trie_values(map), cow_trie_values(map) - (ptr_size - val_size), val_size * value_count);
+            cow_trie_children(map)[c_physical_idx] = child;
+        }
+    }
+    //end of values array, end of child array
+    else if (v_physical_idx == value_count && c_physical_idx == child_count) {
+        memmove(cow_trie_values(map) + ptr_size, cow_trie_values(map), val_size * value_count);
+        cow_trie_children(map)[c_physical_idx] = child;
+        map->child_bitmap = map->child_bitmap | bitmask_loc;
+    }
+    //beginning of values array, beginning or middle of child array
+    else if (v_physical_idx == 0 && c_physical_idx > 0 && c_physical_idx < child_count) {
+        if (vals_greater) {
+            memmove(cow_trie_children(map)[c_physical_idx + 1], cow_trie_children(map)[c_physical_idx],
+                    (child-count - c_physical_idx) * ptr_size);
+            cow_trie_children(map)[c_physical_idx] = child;
+            map->child_bitmap = map->child_bitmap | bitmask_loc;
+            memmove(cow_trie_values(map), cow_trie_values(map) + (val_size - ptr_size),
+                    value_count * val_size);
+        }
+        else {
+            memmove(cow_trie_values(map) + ptr_size, cow_trie_values(map)[1], value_count * val_size);
+            memmove(cow_trie_children(map)[c_physical_idx + 1], cow_trie_children(map)[c_physical_idx],
+                    (child-count - c_physical_idx) * ptr_size);
+            cow_trie_children(map)[c_physical_idx] = child;
+            map->child_bitmap = map->child_bitmap | bitmask_loc;
+        }
+    }
+    //middle of values array, beginning or middle of child array (worst and probably most frequent case)
+    //could these be faster?
+    else if (v_physical_idx > 0 && v_physical_idx < value_count && 
+        c_physical_idx > 0 && c_physical_idx < child_count) {
+        if (vals_greater) {
+            memmove(cow_trie_values(map) + (val_size - ptr_size), cow_trie_values(map),
+                    val_size * v_physical_idx);
+            memmove(cow_trie_children(map)[c_physical_idx + 1], cow_trie_children(map)[c_physical_idx],
+                    (child_count - c_physical_idx) * ptr_size);
+            cow_trie_children(map)[c_physical_idx] = child;
+            map->child_bitmap = map->child_bitmap | bitmask_loc;
+            memmove(cow_trie_values(map)[v_physical_idx], cow_trie_values(map)[v_physical_idx] + (val_size - ptr_size),
+                    (value_count - v_physical_idx) * val_size);
+        }
+        else {
+            memmove(cow_trie_values(map)[v_physical_idx+1] + (ptr_size - val_size),
+                    cow_trie_values(map)[v_physical_idx+1],
+                    (value_count - v_physical_idx) * val_size);
+            memmove(cow_trie_values(map) + (ptr_size - val_size),
+                    cow_trie_values(map), val_size * v_physical_idx);
+            memmove(cow_trie_children(map)[c_physical_idx + 1], cow_trie_children(map)[c_physical_idx],
+                    (child_count - c_physical_idx) * ptr_size);
+            cow_trie_children(map)[c_physical_idx] = child;
+            map->child_bitmap = map->child_bitmap | bitmask_loc;
+        }
+    }
+    //end of values array, beginning or middle of child array
+    else if (v_physical_idx == value_count  && 
+        c_physical_idx > 0 && c_physical_idx < child_count) {
+        memmove(cow_trie_values(map) + ptr_size, cow_trie_values(map), value_count * val_size);
+        memmove(cow_trie_children(map)[c_physical_idx + 1], cow_trie_children(map)[c_physical_idx],
+                (child_count - c_physical_idx) * ptr_size);
+        cow_trie_children(map)[c_physical_idx] = child;
+        map->child_bitmap = map->child_bitmap | bitmask_loc;
+    }
+}
+
 
 int cow_trie_insert(cow_trie_p map, key_t key, val_t val, cow_trie_p *res) {
     int rc = 0;
@@ -224,7 +322,9 @@ int cow_trie_insert(cow_trie_p map, key_t key, val_t val, cow_trie_p *res) {
         child->value_bitmap     = 1 << child_vks[0].key_frag;
         int c_physical_idx      = count_one_bits(map->child_bitmap & bitmask_lower);
         //if the child array is full
-        if (map->size < (child_count + 1) * sizeof(cow_trie_p) + (value_count-1) * sizeof(val_key_t)) { 
+        if (map->size < sizeof(cow_trie_t) + 
+            (child_count + 1) * sizeof(cow_trie_p) + 
+            (value_count-1) * sizeof(val_key_t)) { 
             cow_trie_p n            = cow_trie_alloc(child_count+1, value_count);
             n->value_bitmap         = map->value_bitmap ^ bitmask_loc;
             n->child_bitmap         = map->child_bitmap | bitmask_loc;
@@ -239,8 +339,8 @@ int cow_trie_insert(cow_trie_p map, key_t key, val_t val, cow_trie_p *res) {
             *res = n;
         }
         else {
+            move_stuff_around(map, child_count, value_count-1, bitmask_loc child, physical_idx);
             map->value_bitmap = map->value_bitmap ^ bitmask_loc;
-            map->child_bitmap = map->child_bitmap | bitmask_loc;
             cow_trie_p* children = cow_trie_children(map);
             children[c_physical_idx] = child;
             *res = map;
@@ -249,8 +349,10 @@ int cow_trie_insert(cow_trie_p map, key_t key, val_t val, cow_trie_p *res) {
     }
     else {
         int physical_idx = count_one_bits(map->value_bitmap & bitmask_lower);
-        //if the value array is full
-        if (map->size < (child_count) * sizeof(cow_trie_p) + (value_count + 1) * sizeof(val_key_t)) {
+        //if there's no room for a value
+        if (map->size < sizeof(cow_trie_t) + 
+            ((child_count) * sizeof(cow_trie_p)) + 
+            ((value_count + 1) * sizeof(val_key_t))) {
             cow_trie_p n = cow_trie_alloc(child_count, value_count+1);
             n->value_bitmap = map->value_bitmap | bitmask_loc;
             n->child_bitmap = map->child_bitmap;
@@ -267,6 +369,7 @@ int cow_trie_insert(cow_trie_p map, key_t key, val_t val, cow_trie_p *res) {
         else {
             map->value_bitmap = map->value_bitmap | bitmask_loc;
             val_key_p vals = cow_trie_values(map);
+            memmove(vals[physical_idx+1], vals[physical_idx], value_count - physical_idx);
             vals[physical_idx].key_frag = key >> BITS_PER_LVL;
             vals[physical_idx].val = val;
         }

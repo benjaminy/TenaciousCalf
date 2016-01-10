@@ -78,8 +78,8 @@ static val_key_p cow_trie_values( cow_trie_p m )
     return (val_key_p)&( ( cow_trie_children( m ) )[ child_count ] );
 }
 
-const int      CHILD_ARRAY_BUFFER_SIZE = 0;
-const int      VALUE_ARRAY_BUFFER_SIZE = 0;
+const int      CHILD_ARRAY_BUFFER_SIZE = 2;
+const int      VALUE_ARRAY_BUFFER_SIZE = 2;
 const uint32_t           LOW_BITS_MASK = 0x1f;
 const int                 BITS_PER_LVL = 5;
 const int                 LVL_CAPACITY = 1 << ( BITS_PER_LVL );
@@ -280,6 +280,7 @@ int move_stuff_around(cow_trie_p map, int child_count, int value_count, uint32_t
         cow_trie_children(map)[c_physical_idx] = child;
         map->child_bitmap = map->child_bitmap | bitmask_loc;
     }
+    return 1;
 }
 
 

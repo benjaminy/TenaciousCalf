@@ -3,7 +3,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
-#include <time.h>
 
 static int count_one_bits( uint32_t bits )
 {
@@ -95,21 +94,6 @@ cow_trie_p cow_trie_alloc( int children, int values )
 
 node_or_edge_p node_or_edge_alloc(int tag, int num_preds, int num_succs) {
     node_or_edge_p n = (node_or_edge_p)malloc(sizeof(n[0]));
-    fflush(stdout);
-    if (tag == 0) {
-        n->tag=0;
-        int *p_array;
-        int *s_array;
-        p_array = (int *)malloc(sizeof(int)*num_preds);
-        s_array = (int *)malloc(sizeof(int)*num_succs);
-        n->_.node.preds = p_array;
-        n->_.node.succs = s_array;
-        n->_.node.pred_ct = num_preds;
-        n->_.node.succ_ct = num_succs;
-    }
-    else if (tag == 1) {
-        n->tag = 1;
-    }
     return n;
 }
 
@@ -207,14 +191,14 @@ int move_stuff_around(cow_trie_p map, int child_count, int value_count, uint32_t
     //could these be faster?
     if (v_physical_idx > 0 && v_physical_idx < value_count && c_physical_idx == child_count) {
         if (vals_greater) {
-            memmove(cow_trie_values(map)[1], cow_trie_values(map)[0],
+            memmove(&cow_trie_values(map)[1], &cow_trie_values(map)[0],
                     val_size * v_physical_idx);
             cow_trie_children(map)[c_physical_idx] = child;
             map->child_bitmap = map->child_bitmap | bitmask_loc;
             memmove(cow_trie_values(map), cow_trie_values(map) + (val_size - ptr_size), value_count * val_size);
         }
         else {
-            memmove(cow_trie_values(map)[1], cow_trie_values(map[0],
+            memmove(&cow_trie_values(map)[1], &cow_trie_values(map)[0],
                     val_size * v_physical_idx);
             map->child_bitmap = map->child_bitmap | bitmask_loc;
             memmove(cow_trie_values(map), cow_trie_values(map) - (ptr_size - val_size), val_size * value_count);
@@ -231,16 +215,16 @@ int move_stuff_around(cow_trie_p map, int child_count, int value_count, uint32_t
     else if (v_physical_idx == 0 && c_physical_idx > 0 && c_physical_idx < child_count) {
         if (vals_greater) {
             memmove(cow_trie_children(map)[c_physical_idx + 1], cow_trie_children(map)[c_physical_idx],
-                    (child-count - c_physical_idx) * ptr_size);
+                    (child_count - c_physical_idx) * ptr_size);
             cow_trie_children(map)[c_physical_idx] = child;
             map->child_bitmap = map->child_bitmap | bitmask_loc;
             memmove(cow_trie_values(map), cow_trie_values(map) + (val_size - ptr_size),
                     value_count * val_size);
         }
         else {
-            memmove(cow_trie_values(map) + ptr_size, cow_trie_values(map)[1], value_count * val_size);
+            memmove(cow_trie_values(map) + ptr_size, &cow_trie_values(map)[1], value_count * val_size);
             memmove(cow_trie_children(map)[c_physical_idx + 1], cow_trie_children(map)[c_physical_idx],
-                    (child-count - c_physical_idx) * ptr_size);
+                    (child_count - c_physical_idx) * ptr_size);
             cow_trie_children(map)[c_physical_idx] = child;
             map->child_bitmap = map->child_bitmap | bitmask_loc;
         }
@@ -256,12 +240,12 @@ int move_stuff_around(cow_trie_p map, int child_count, int value_count, uint32_t
                     (child_count - c_physical_idx) * ptr_size);
             cow_trie_children(map)[c_physical_idx] = child;
             map->child_bitmap = map->child_bitmap | bitmask_loc;
-            memmove(cow_trie_values(map)[v_physical_idx], cow_trie_values(map)[v_physical_idx] + (val_size - ptr_size),
+            memmove(&cow_trie_values(map)[v_physical_idx], &cow_trie_values(map)[v_physical_idx] + (val_size - ptr_size),
                     (value_count - v_physical_idx) * val_size);
         }
         else {
-            memmove(cow_trie_values(map)[v_physical_idx+1] + (ptr_size - val_size),
-                    cow_trie_values(map)[v_physical_idx+1],
+            memmove(&cow_trie_values(map)[v_physical_idx+1] + (ptr_size - val_size),
+                    &cow_trie_values(map)[v_physical_idx+1],
                     (value_count - v_physical_idx) * val_size);
             memmove(cow_trie_values(map) + (ptr_size - val_size),
                     cow_trie_values(map), val_size * v_physical_idx);
@@ -340,7 +324,7 @@ int cow_trie_insert(cow_trie_p map, key_t key, val_t val, cow_trie_p *res) {
             *res = n;
         }
         else {
-            move_stuff_around(map, child_count, value_count-1, bitmask_loc child, physical_idx);
+            move_stuff_around(map, child_count, value_count-1, bitmask_loc, child, physical_idx, c_physical_idx);
             map->value_bitmap = map->value_bitmap ^ bitmask_loc;
             cow_trie_p* children = cow_trie_children(map);
             children[c_physical_idx] = child;
@@ -370,7 +354,7 @@ int cow_trie_insert(cow_trie_p map, key_t key, val_t val, cow_trie_p *res) {
         else {
             map->value_bitmap = map->value_bitmap | bitmask_loc;
             val_key_p vals = cow_trie_values(map);
-            memmove(vals[physical_idx+1], vals[physical_idx], value_count - physical_idx);
+            memmove(&vals[physical_idx+1], &vals[physical_idx], value_count - physical_idx);
             vals[physical_idx].key_frag = key >> BITS_PER_LVL;
             vals[physical_idx].val = val;
         }
@@ -379,21 +363,6 @@ int cow_trie_insert(cow_trie_p map, key_t key, val_t val, cow_trie_p *res) {
     }
     return 0;
 }
-
-
-/*int main( int argc, char **argv )
-{
-    cow_trie_p f = cow_trie_alloc(0, 0);
-    f->child_bitmap = 0;
-    f->value_bitmap = 0;
-    cow_trie_insert(f, 5, 10, &f);
-    uint32_t q = 0;
-    cow_trie_insert(f, 37, 14, &f);
-    cow_trie_p abc = cow_trie_copy_node(f);
-    cow_trie_insert(abc, 501472, 123, &abc);
-    cow_trie_lookup(abc, 501472, &q);
-    printf("value is %d", q);
-}*/
 
 int main(int argc, char **argv) {
     cow_trie_p test = cow_trie_alloc(0,0);

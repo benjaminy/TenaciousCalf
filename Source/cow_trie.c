@@ -306,7 +306,7 @@ int cow_trie_insert(cow_trie_p map, key_t key, val_t val, cow_trie_p *res) {
         child_vks[0].key_frag   = vks[physical_idx].key_frag >> BITS_PER_LVL;
         child->value_bitmap     = 1 << child_vks[0].key_frag;
         int c_physical_idx      = count_one_bits(map->child_bitmap & bitmask_lower);
-        //if the child array is full
+        //if there's no room for a child, minus a value
         if (map->size < sizeof(cow_trie_t) + 
             (child_count + 1) * sizeof(cow_trie_p) + 
             (value_count-1) * sizeof(val_key_t)) { 
@@ -326,8 +326,7 @@ int cow_trie_insert(cow_trie_p map, key_t key, val_t val, cow_trie_p *res) {
         else {
             move_stuff_around(map, child_count, value_count-1, bitmask_loc, child, physical_idx, c_physical_idx);
             map->value_bitmap = map->value_bitmap ^ bitmask_loc;
-            cow_trie_p* children = cow_trie_children(map);
-            children[c_physical_idx] = child;
+            rc = cow_trie_insert(child, key >> BITS_PER_LVL, val, &child);
             *res = map;
         }
         return 1;
@@ -347,15 +346,15 @@ int cow_trie_insert(cow_trie_p map, key_t key, val_t val, cow_trie_p *res) {
             memcpy(new_vals + (physical_idx + 1) * sizeof(val_key_t),
                    cow_trie_values(map) + physical_idx * sizeof(val_key_t),
                    (value_count - physical_idx) * sizeof(val_key_t));
-            new_vals[physical_idx].key_frag = key >> BITS_PER_LVL;
+            new_vals[physical_idx].key_frag = key;
             new_vals[physical_idx].val = val;
             *res = n;
         }
         else {
             map->value_bitmap = map->value_bitmap | bitmask_loc;
             val_key_p vals = cow_trie_values(map);
-            memmove(&vals[physical_idx+1], &vals[physical_idx], value_count - physical_idx);
-            vals[physical_idx].key_frag = key >> BITS_PER_LVL;
+            memmove(&vals[physical_idx+1], &vals[physical_idx], (value_count - physical_idx) * sizeof(val_key_t));
+            vals[physical_idx].key_frag = key;
             vals[physical_idx].val = val;
         }
         return 1;
@@ -391,5 +390,5 @@ int main(int argc, char **argv) {
     val_t u;
     cow_trie_lookup(test, 524634, &u);
     uint32_t abc = u._.edge.label;
-    printf("value is %d", q);
+    printf("value is %d", abc);
 }

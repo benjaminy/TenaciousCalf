@@ -25,12 +25,12 @@ typedef struct g_node_t g_node_t, *g_node_p;
 struct g_node_t {
     uint32_t label;
     size_t pred_ct, succ_ct;
-    int *preds, *succs;
+    uint32_t *preds, *succs;
 };
 
 struct g_edge_t {
     uint32_t label;
-    int pred, succ;
+    uint32_t pred, succ;
 };
 
 typedef struct g_edge_t g_edge_t, *g_edge_p;
@@ -363,7 +363,7 @@ int cow_trie_insert(cow_trie_p map, key_t key, val_t val, cow_trie_p *res) {
     return 0;
 }
 
-int main(int argc, char **argv) {
+/*int main(int argc, char **argv) {
     cow_trie_p test = cow_trie_alloc(0,0);
     test->child_bitmap = 0;
     test->value_bitmap = 0;
@@ -391,4 +391,4 @@ int main(int argc, char **argv) {
     cow_trie_lookup(test, 524634, &u);
     uint32_t abc = u._.edge.label;
     printf("value is %d", abc);
-}
+}*/

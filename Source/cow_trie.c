@@ -77,8 +77,8 @@ static val_key_p cow_trie_values( cow_trie_p m )
     return (val_key_p)&( ( cow_trie_children( m ) )[ child_count ] );
 }
 
-const int      CHILD_ARRAY_BUFFER_SIZE = 2;
-const int      VALUE_ARRAY_BUFFER_SIZE = 2;
+const int      CHILD_ARRAY_BUFFER_SIZE = 0;
+const int      VALUE_ARRAY_BUFFER_SIZE = 1;
 const uint32_t           LOW_BITS_MASK = 0x1f;
 const int                 BITS_PER_LVL = 5;
 const int                 LVL_CAPACITY = 1 << ( BITS_PER_LVL );
@@ -363,32 +363,28 @@ int cow_trie_insert(cow_trie_p map, key_t key, val_t val, cow_trie_p *res) {
     return 0;
 }
 
-/*int main(int argc, char **argv) {
+int main(int argc, char **argv) {
     cow_trie_p test = cow_trie_alloc(0,0);
     test->child_bitmap = 0;
     test->value_bitmap = 0;
-    node_or_edge_p n = node_or_edge_alloc(0, 27, 15);
-    n->tag=0;
-    n->_.node.label = 43126487;
-    n->_.node.pred_ct = 27;
-    n->_.node.succ_ct = 15;
-    int *p_array = (int *)malloc(sizeof(int)*27);
-    int *s_array = (int *)malloc(sizeof(int)*15);
-    n->_.node.preds = p_array;
-    n->_.node.succs = s_array;
-    cow_trie_insert(test, 529018, *n, &test);
-    val_t d;
-    cow_trie_lookup(test, 529018, &d);
-    uint32_t q = d._.node.label;
-    printf("value is %d", q);
-    node_or_edge_p t = node_or_edge_alloc(1, 0, 0);
-    t->tag=1;
-    t->_.edge.label = 4381279;
-    t->_.edge.pred = 1234;
-    t->_.edge.succ = 87537;
-    cow_trie_insert(test, 524634, *t, &test);
-    val_t u;
-    cow_trie_lookup(test, 524634, &u);
-    uint32_t abc = u._.edge.label;
-    printf("value is %d", abc);
-}*/
+    node_or_edge_p n1 = node_or_edge_alloc(0, 27, 15);
+    n1->tag=1;
+    n1->_.edge.label = 50;
+    n1->_.edge.pred = 90;
+    n1->_.edge.succ = 91;
+    node_or_edge_p n2 = node_or_edge_alloc(0, 27, 15);
+    n2->tag=1;
+    n2->_.edge.label = 51;
+    n2->_.edge.pred = 92;
+    n2->_.edge.succ = 93;
+    node_or_edge_p n3 = node_or_edge_alloc(0, 27, 15);
+    n3->tag=1;
+    n3->_.edge.label = 53;
+    n3->_.edge.pred = 94;
+    n3->_.edge.succ = 95;
+    cow_trie_insert(test, 2, *n1, &test);
+    cow_trie_insert(test, 1, *n2, &test);
+    cow_trie_insert(test, 0, *n3, &test);
+    val_t q;
+    cow_trie_lookup(test, 1, &q);
+}

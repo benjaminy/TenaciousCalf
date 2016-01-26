@@ -18,8 +18,8 @@ static val_key_p cow_trie_values( cow_trie_p m )
     return (val_key_p)&( ( cow_trie_children( m ) )[ child_count ] );
 }
 
-const int      CHILD_ARRAY_BUFFER_SIZE = 0;
-const int      VALUE_ARRAY_BUFFER_SIZE = 1;
+const int      CHILD_ARRAY_BUFFER_SIZE = 2;
+const int      VALUE_ARRAY_BUFFER_SIZE = 2;
 const uint32_t           LOW_BITS_MASK = 0x1f;
 const int                 BITS_PER_LVL = 5;
 const int                 LVL_CAPACITY = 1 << ( BITS_PER_LVL );

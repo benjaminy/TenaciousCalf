@@ -31,13 +31,13 @@ node_or_edge_p node_or_edge_alloc(int tag, int num_preds, int num_succs) {
 
 
 val_t cow_trie_create_val(int tag,
-                                 uint32_t label, 
-                                 size_t pred_ct, 
-                                 size_t succ_ct, 
-                                 uint32_t *preds,
-                                 uint32_t *succs,
-                                 uint32_t pred,
-                                 uint32_t succ) {
+                          uint32_t label, 
+                          size_t pred_ct, 
+                          size_t succ_ct, 
+                          uint32_t *preds,
+                          uint32_t *succs,
+                          uint32_t pred,
+                          uint32_t succ) {
     node_or_edge_p thing = node_or_edge_alloc(tag, 0, 0);
     if (tag == 0) {
         thing->tag = 0;
@@ -86,7 +86,7 @@ cow_trie_p cow_trie_alloc( int children, int values ) {
 
 cow_trie_p cow_trie_clone_node( cow_trie_p map, int children, int values )
 {
-    cow_trie_p m = malloc(
+    cow_trie_p m = (cow_trie_p)malloc(
                sizeof( m[0] ) + children * sizeof( cow_trie_p )
         + values * sizeof( val_key_t ) );
     if( m )
@@ -119,8 +119,8 @@ void cow_trie_close_node(cow_trie_p node) {
         val_key_p vals = cow_trie_values(node);
         for (int i=0;i<num_values;i++) {
             if (vals[i].val.tag == 0) {
-                free(vals[i].val._.node.preds);
-                free(vals[i].val._.node.succs);
+                //free(vals[i].val._.node.preds);
+                //free(vals[i].val._.node.succs);
             }
         }
         int num_kids = count_one_bits(node->child_bitmap);
@@ -393,64 +393,62 @@ int cow_trie_insert(cow_trie_p map, vkey_t key, val_t val, cow_trie_p *res) {
     return 0;
 }
 
-int main(int argc, char **argv) {
-    cow_trie_p test = cow_trie_alloc(0,0);
-    test->ref_count = 1;
-    test->child_bitmap = 0;
-    test->value_bitmap = 0;
-    node_or_edge_p n1 = node_or_edge_alloc(1, 0, 0);
-    n1->tag=0;
-    n1->_.node.label = 50;
-    n1->_.node.pred_ct = 10;
-    n1->_.node.succ_ct = 7;
-    n1->_.node.preds = (uint32_t *)malloc(sizeof(uint32_t)*10);
-    n1->_.node.succs = (uint32_t *)malloc(sizeof(uint32_t)*7);
-    for (int i=0;i<10;i++) {
-        n1->_.node.preds[i] = 749287;
+int cow_trie_delete(cow_trie_p map, vkey_t key, cow_trie_p *res) {
+    int rc = 0;
+    int virtual_idx = key & LOW_BITS_MASK;
+    uint32_t bitmask_loc = 1 << virtual_idx;
+    uint32_t bitmask_lower;
+    int shift_amt = LVL_CAPACITY - virtual_idx;
+    if (shift_amt != 32) {
+        bitmask_lower = ( ~0U ) >> ( shift_amt );
     }
-    for (int i=0;i<7;i++) {
-        n1->_.node.succs[i] = 432789;
+    else {
+        bitmask_lower = 0;
     }
-    node_or_edge_p n2 = node_or_edge_alloc(1, 0, 0);
-    n2->tag=0;
-    n2->_.node.label = 51;
-    n2->_.node.pred_ct = 10;
-    n2->_.node.succ_ct = 7;
-    n2->_.node.preds = (uint32_t *)malloc(sizeof(uint32_t)*10);
-    n2->_.node.succs = (uint32_t *)malloc(sizeof(uint32_t)*7);
-    for (int i=0;i<10;i++) {
-        n2->_.node.preds[i] = 749287;
+    int child_count = count_one_bits(map->child_bitmap);
+    int value_count = count_one_bits(map->value_bitmap);
+    
+    if (bitmask_loc & map->child_bitmap) {
+        int physical_idx = count_one_bits(map->child_bitmap & bitmask_lower);
+        cow_trie_p *c = cow_trie_children(map);
+        cow_trie_p n = c[physical_idx];
+        cow_trie_p child;
+        if ((n)->ref_count > 1) {
+            child = cow_trie_copy_node(n);
+            --(n)->ref_count;
+            c[physical_idx] = child;
+        }
+        else {
+            child = n;
+        }
+        rc = cow_trie_delete(child, key >> BITS_PER_LVL, &child);
+        if (rc == 2) {
+            free(child);
+            map->child_bitmap = map->child_bitmap ^ bitmask_loc;
+            memmove(&c[physical_idx], &c[physical_idx+1], (child_count - physical_idx) * sizeof(cow_trie_p) +
+                                                          (value_count) * sizeof(val_key_t));
+        }
+        rc = 1;
     }
-    for (int i=0;i<7;i++) {
-        n2->_.node.succs[i] = 432789;
+    else if (bitmask_loc & map->value_bitmap) {
+        int physical_idx        = count_one_bits(map->value_bitmap & bitmask_lower);
+        val_key_p vals = cow_trie_values(map);
+        if (vals[physical_idx].key_frag == key) {
+            map->value_bitmap = map->value_bitmap ^ bitmask_loc;
+            memmove(&vals[physical_idx], &vals[physical_idx+1], (value_count - physical_idx) * sizeof(val_key_t));
+            if (value_count == 1 && child_count == 0) {
+                rc = 2;
+            }
+            else {
+                rc = 1;
+            }
+        }
+        else {
+            rc = 0;
+        }
     }
-    node_or_edge_p n3 = node_or_edge_alloc(1, 0, 0);
-    n3->tag=0;
-    n3->_.node.label = 53;
-    n3->_.node.pred_ct = 10;
-    n3->_.node.succ_ct = 7;
-    n3->_.node.preds = (uint32_t *)malloc(sizeof(uint32_t)*10);
-    n3->_.node.succs = (uint32_t *)malloc(sizeof(uint32_t)*7);
-    for (int i=0;i<10;i++) {
-        n3->_.node.preds[i] = 749287;
+    else {
+        rc = 0;        
     }
-    for (int i=0;i<7;i++) {
-        n3->_.node.succs[i] = 432789;
-    }
-    cow_trie_insert(test, 1, *n1, &test);
-    free(n1);
-    cow_trie_insert(test, 2, *n2, &test);
-    free(n2);
-    cow_trie_insert(test, 3, *n3, &test);
-    free(n3);
-    /*cow_trie_p new_node = cow_trie_copy_node(test);
-    cow_trie_insert(new_node, 97, *n5, &new_node);
-    val_t q;
-    cow_trie_lookup(new_node, 97, &q);
-    if (q.tag == 0) {
-        printf("node label from lookup == %d\n ", q._.node.label);
-    }
-    else if (q.tag == 1) {
-        printf("edge label from lookup == %d\n", q._.edge.label);
-    }*/
+    return rc;
 }

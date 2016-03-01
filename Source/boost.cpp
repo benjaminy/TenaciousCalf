@@ -27,7 +27,6 @@ long long n_count = 2000000;
 Vertex vt;
 
 int random_walk(Vertex vt, IndexMap index, Graph g) {
-    uint32_t *wa = (uint32_t *)malloc(sizeof(uint32_t) * size_walk);
     for (int i=0;i<size_walk;i++) {
         boost::graph_traits<Graph>::out_edge_iterator out_i, out_end;
         GraphTraits::edge_descriptor e;
@@ -45,15 +44,10 @@ int random_walk(Vertex vt, IndexMap index, Graph g) {
         out_i = out_i + random_edge;
         e = *out_i;
         vt = target(e, g);
-        wa[i]=index[vt];
-    }
-    for (int i=0;i<size_walk;i++) {
-        std::cout << wa[i] << "\n";
     }
     return 1;
 }
 int random_walk_c(val_t vt, cow_trie_p g) {
-    uint32_t *wa = (uint32_t *)malloc(sizeof(uint32_t) * size_walk);
     for (int i=0;i<size_walk;i++) {
         uint32_t e_degree = vt._.node.succ_ct;
         while (e_degree == 0) {
@@ -64,11 +58,7 @@ int random_walk_c(val_t vt, cow_trie_p g) {
         uint32_t random_edge = random_int(0, e_degree-1);
         uint32_t key = vt._.node.succs[random_edge];
         cow_trie_lookup(g, key, &vt);
-        wa[i] = vt._.edge.succ;
         cow_trie_lookup(g, vt._.edge.succ, &vt);
-    }
-    for (int i=0;i<size_walk;i++) {
-        std::cout << wa[i] << "\n";
     }
     return 1;
 }

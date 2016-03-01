@@ -81,6 +81,9 @@ cow_trie_p cow_trie_alloc( int children, int values ) {
                     + (values + VALUE_ARRAY_BUFFER_SIZE) * sizeof(val_key_t);
     cow_trie_p n = (cow_trie_p)malloc(size);
     n->size = size;
+    n->ref_count=1;
+    n->child_bitmap=0;
+    n->value_bitmap=0;
     return n;
 }
 
@@ -128,7 +131,7 @@ void cow_trie_close_node(cow_trie_p node) {
             cow_trie_p *children = cow_trie_children(node);
             cow_trie_close_node(children[i]);
         }
-        free(node);
+        //free(node);
     }
 }
 static val_key_t *cow_val_ref( cow_trie_p map, int ccount, int vidx )

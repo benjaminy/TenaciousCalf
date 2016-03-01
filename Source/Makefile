@@ -1,9 +1,14 @@
-BUILD_DIR = ../Build
+cow_trie.o: cow_trie.c
+	g++ -c -g -O1 $<
 
-all: $(BUILD_DIR)/foo $(BUILD_DIR)/hash
+tester.o: tester.c
+	g++ -c -g -O1 $<
 
-$(BUILD_DIR)/foo: array.c
-	gcc -Wall -o $(BUILD_DIR)/foo -O2 array.c
+boost.o: boost.cpp
+	g++ -c -g $<
 
-$(BUILD_DIR)/hash: hpy_hash_map.c
-	gcc -Wall -o $(BUILD_DIR)/hash -g hpy_hash_map.c
+test: boost.o cow_trie.o tester.o
+	g++ -o $@ -g $?
+
+clean:
+	rm -f cow_trie.o tester.o boost.o test

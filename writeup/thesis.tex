@@ -1,25 +1,3 @@
-%-----------------------------------------------------------------------------
-%
-%               Template for sigplanconf LaTeX Class
-%
-% Name:         sigplanconf-template.tex
-%
-% Purpose:      A template for sigplanconf.cls, which is a LaTeX 2e class
-%               file for SIGPLAN conference proceedings.
-%
-% Guide:        Refer to "Author's Guide to the ACM SIGPLAN Class,"
-%               sigplanconf-guide.pdf
-%
-% Author:       Paul C. Anagnostopoulos
-%               Windfall Software
-%               978 371-2316
-%               paul@windfall.com
-%
-% Created:      15 February 2005
-%
-%-----------------------------------------------------------------------------
-
-
 \documentclass[preprint]{sigplanconf}
 
 % The following \documentclass options may be useful:
@@ -72,7 +50,7 @@
 \begin{abstract}
 In the world of persistent data structures, there exist few high performance graph libraries.
 We propose in this paper a C library which stores an application-controlled persistent graph in a structure derived from a hash array mapped trie, using chunking and lazy copying to conserve memory and increase performance.
-We achieve -some stuff about time complexity that I haven't figured out yet-.
+We achieve -some stuff about time complexity that I haven't figured out yet and I have no results help-.
 \end{abstract}
 
 \category{CR-number}{subcategory}{third-level}
@@ -128,14 +106,60 @@ Therefore, when we insert G into D', we will copy any nodes that have reference 
 \centering
 \end{figure}
 \subsection{Tries}
-How do we represent a graph persistently? We know that whatever structure we use, if we want to efficiently store memory between versions, needs to have elements of tree-like structure, with pointers between them.
+How do we represent a graph persistently? We know that whatever structure we use, if we want to efficiently store memory between versions, needs to have elements of tree-like structure, with pointers between discrete parts.
 A simple binary search tree is possible, and is used for some persistent graph libraries.
 However, the use of a binary search tree introduces significant memory inefficiency.
-
-
-
-
-
+If a node can only point to two other nodes, trees become very deep very quickly, which means lookups become costly.
+Rather, our paper discusses the use of a wide-fanout key-mapped trie, a derivative of the hash array mapped trie (Bagwell, 2000).
+Our structure has the following characteristics:
+\begin{itemize}
+\item The library performs no hashing. Rather, the library assumes a value has a unique key or ID.
+\item Values are stored only in leaves.
+\item Wide fanout, to minimize tree depth.
+\item Array compression, with bitmaps to indicate non-null positions.
+\item Values are stored in their parent nodes.
+\item Nodes without children are combined with their parents, to reduce the number of pointers.
+\end{itemize}
+The chunking together of nodes without children with their parents means that nodes are effectively stored by the first unique bits of their key rather than the entire key itself.
+To understand how this works, consider a hypothetical insert with keys of length 8, and 4-bit fanout among nodes, of a value with the key 11000110.
+Since our fanout is 4 bits, we will consider two bits of the key at a time in determining which branch of the trie to pursue.
+\begin{figure}[H]
+\includegraphics[scale=.5]{trie1}
+\centering
+\end{figure}
+Here, we could create nodes that span the entire depth of the tree to insert the value, but since we would chunk these nodes together later, we will simply store the node by the first section of the key that is unique in the entire set of keys.
+Since the root node is empty, we can store the value directly in the first branch.
+Since there are no other keys that begin with 10 in the set of keys, we don't need to create an interstitial node.
+Inserting a node with a key that also begins with 10 results in the following adjustments:
+\begin{figure}[H]
+\includegraphics[scale=.5]{trie2}
+\centering
+\end{figure}
+Further, since all values are stored in the leaves of the tree, we will actually store the bolded values in arrays at the tail end of each parent node. Hence, our current trie will actually appear like this in memory:
+\begin{figure}[H]
+\includegraphics[scale=.4]{trie2actual}
+\centering
+\end{figure}
+Storing these pointers and values in arrays seems to indicate that, for nodes with low populations, we waste a lot of space on empty array slots.
+We compensate for this with an array compression scheme borrowed from the hash array mapped trie.
+In this scheme, the actual arrays that store pointers and values are dense and dynamically sized.
+Each node stores two bitmaps that store data about which spots in our hypothetically complete array are occupied. 
+If we want to access a value or pointer at a particular position, we will perform some bitwise arithmetic to determine in which dense array slot our desired value lies.
+To illustrate an example, let us consider a bitmap 12 bits in length, which tells us about an array with seven values, 011011101010.
+For ease of comprehension, the array will be reversed so that the least significant bits of the bitmap correspond to the lowest indices in the array:
+\begin{figure}[H]
+\includegraphics[scale=.5]{bitmask}
+\centering
+\end{figure}
+The bitmap indicates that the keys 2, 4, 6, 7, 8, 10, and 11 are currently occupied by values.
+Let's imagine the key we want to use for insertion or lookup is 9.
+This means we want to check the 8th index of the bitmap. To verify whether this spot is empty, we will simply bitwise AND together the bitmask and a number whose 8 least significant bits are 1s.
+The number of 1s in the result how many spots are occupied in the dense array prior to the one we want to insert into (or, in other words, the index of our desired spot).
+We will simply use our built-in popcount instruction to derive the index we need in our dense array, 5:
+\begin{figure}[H]
+\includegraphics[scale=.5]{bitmask2}
+\centering
+\end{figure}
 
 \appendix
 \section{Appendix Title}

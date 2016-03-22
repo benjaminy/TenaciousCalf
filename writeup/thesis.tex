@@ -35,7 +35,7 @@
 \preprintfooter{short description of paper}   % 'preprint' option specified.
 
 \title{High-Performance Persistent Graphs}
-\subtitle{}
+\subtitle{Storing graphs in key-mapped tries with lazy copying persistence}
 
 \authorinfo{John Moody}
            {Colorado College '16}
@@ -46,11 +46,9 @@
 
 \maketitle
 
-%should there be some kind of general comment about the current state of persistent data structures, either here or in the introduction?
-
 \begin{abstract}
 In the world of persistent data structures, there exist few high performance graph libraries.
-We propose in this paper a C library which stores an application-controlled persistent graph in a structure derived from a hash array mapped trie, using chunking and lazy copying to conserve memory and increase performance.
+We propose in this paper a C library which stores an application-controlled persistent graph in a key-mapped trie, using chunking and lazy copying to conserve memory and increase performance.
 We achieve -some stuff about time complexity that I haven't figured out yet and I have no results help-.
 \end{abstract}
 
@@ -65,7 +63,7 @@ A graph defines some number of nodes and edges, which connect nodes together.
 Graphs have wide-ranging applications, from computational models to databases, networking and pathfinding.
 To get information about nodes or edges in a graph within a program we typically use an array or some manner of key-value store.
 A graph node's value is usually a list of adjacent nodes, which are either predecessors to that node or successors.
-The value associated with an edge is typically just the predecessor and successors node IDs.
+The value associated with an edge is typically just two identifiers for its predecessor and successor.
 This paper explores storing graphs as a persistent data structure, which has some benefits over the traditional way of storing data for certain applications.
 We will give a background on persistent data structures, and then propose a structure for persistent graphs with strong performance characteristics for various operations and optimized use of memory.
 \section{Persistence}
@@ -113,17 +111,22 @@ Why are persistent data structures interesting, or valuable?
 In a broad sense, persistent data structures offer a way to do quick, cheap analysis on multiple versions of a large data structure.
 In a mutable system, analyzing multiple versions of a data structure typically involves expensive wholesale copying of the structure, with no easy way to reverse changes that have been performed.
 With persistent data structures, copies of a structure can be very small in size relative to the entire structure.
-Reverting changes to that structure becomes simple with the reference counting scheme from above.
-If systems that perform analysis on large data sets are concerned with change to that data set over time, persistent data structures can be a powerful answer in terms of space, and, as we will see, performance.
+Reverting changes to that structure is simple, shown with the reference counting scheme from above.
+If systems that perform analysis on large data sets are concerned with change to that data set over time, persistent data structures can be a powerful tool both in terms of how much space is used as well as performance.
+Further, persistent data structures are more easily guaranteed to be thread-safe, since operations on persistent structures will never write to the parts of their structure that they share with other versions.
+This characteristic makes persistent data structures easily operated on by multiple processes and threads, which dovetails with the increasing numbers of multi-core consumer processors.
+Am I just talking out my ass here or should I say more stuff?
 \section{Tries}
-So, what is the best way to represent a graph persistently? We know that whatever structure we use, if we want to efficiently store memory between versions, we imagine it to have elements of tree-like structure, with pointers between discrete parts.
+So, what is the best way to represent a graph persistently?
+We know that whatever structure we use, if we want to efficiently store memory between versions, we imagine it to have elements of tree-like structure, with pointers between discrete parts.
 A simple binary search tree is possible, and is used for some persistent graph libraries.
 However, the use of a binary search tree introduces significant memory inefficiency.
 If a node can only point to two other nodes, trees become very deep very quickly, which means lookups become costly.
 Rather, our paper discusses the use of a wide-fanout key-mapped trie \textipa{[t\textturnr a\textsci]}, a derivative of the hash array mapped trie.
 Our structure has the following characteristics:
 \begin{itemize}
-\item The library performs no hashing of values. Rather, each value is given a unique key either during or prior to inserting according to the current balance of the trie.
+\item The library performs no hashing of values (nodes or edges of the graph).
+Rather, each value is given a unique key either during or prior to insertion according to the current balance of the trie.
 \item Values are stored only in leaves.
 \item Wide fanout, to minimize trie depth.
 \item Array compression, with bitmaps to indicate non-null positions.
@@ -185,12 +188,22 @@ To ensure good asymptotics when looking up values at random in our graph, as mig
 'Balance,' in the context of tree-like structures, means that values are equally distributed in branches.
 If no part of the trie is deeper than any other part, we have a uniform lookup speed for all values, ensuring that we don't spend a long time finding certain values nested deep in the trie.
 For our trie to retain balance, we have to create keys for new values that place them in the appropriately least-populated section of the trie.
-We employ a simple scheme which could be optimized for greater performance, which we do not investigate here.
+We employ a simple scheme which could be optimized for greater performance.
 In this scheme, a node stores the index of the least populated of its children, as well as the total size of everything beneath that node in the trie.
 After each discrete insertion or deletion from our trie, the total size value is adjusted for each node affected, and, if necessary, the index of the least populated node changed.
-
+In this figure, a value of size 5 is inserted into the right-most branch of the trie, which causes a new least-populated child to be designated:
+\begin{figure}[H]
+\includegraphics[scale=.45]{balancing}
+\centering
+\end{figure}
+After the insert is performed, the child at 10 becomes the new least populated child:
+\begin{figure}[H]
+\includegraphics[scale=.45]{balancing2}
+\centering
+\end{figure}
+This does some stuff to write performance that I'll talk about when I finish coding and testing it.
 \subsection{Buffers}
-With the densely packed arrays from section \texttt{dafjkn}, every time we wish to insert into our trie structure, we need to resize the array of the node we insert into.
+With the densely packed arrays from section 3.1, every time we wish to insert into our trie structure, we need to resize the array of the node we insert into.
 Since structs in C are not dynamically sized, the addition of a new value necessitates re-allocating the entire struct instance to compensate for the newly resized array.
 This results in huge amounts of churning memory, which means very expensive writes.
 To reduce the complexity and churn of the average write, we introduce \texttt{n}-sized buffers at the end of our dense arrays.
@@ -202,16 +215,17 @@ Revisiting our diagram from the previous section, we can see how the buffers beh
 \centering
 \end{figure}
 \subsection{Lazy Copying}
-Nexte will discuss the exact flavor of persistence that our library implements, ``lazy copying.''
+Next we will discuss the exact flavor of persistence that our library implements, ``lazy copying.''
 Using lazy copying, an update to a trie structure \texttt{n} will, by default, be performed in place, without preserving the previous version. 
 Creating a copy of \texttt{n} causes a copy of \texttt{n}, \texttt{n'}, to be created, and increments the reference counts of its children.
 Thenceforth, if an update to to either \texttt{n} or \texttt{n'} changes a node with a reference count greater than one, that node is first copied to prevent other versions of the structure from being modified.
-A high-level example of how this works is seen in the earlier Trees and Reference Counting section.
-Here, chunking introduces redundancy when persistent updates involve copying nodes filled with values.
-
+A high-level example of how this works is seen in the earlier Trees and Reference Counting section. \par
+Our chunking together of values with nodes leads to redundancy using lazy copying.
+If an update to a branch of the trie requires that branch to be copied, and the nodes in that branch are full of values, we will make many redundant copies of the values in that branch.
+We consider this an acceptable tradeoff considering the advantages in read-performance associated with chunking and reducing our overall number of pointers, though this solution does increase our memory footprint as we modify persistent copies of our graph.
 \section{Results}
-We include tests that show our memory usage for persistent updates using various configurations of the library.
-Next, we include a comparison of random insertion/deletion performance for different values of \texttt{VALUE\_BUFFER\_SIZE} and \texttt{CHILD\_BUFFER\_SIZE}.
+We include tests that show our memory usage and read/write performance for mutable and persistent updates using various configurations of the library (32-bit fanout, 64-bit fanout, 16-bit fanout?).
+Next, we include a comparison of random insertion/deletion performance and memory footprint for different values of \texttt{VALUE\_BUFFER\_SIZE} and \texttt{CHILD\_BUFFER\_SIZE}.
 Lastly, for the time complexities of a random traversal of a randomly generated Erdos-Renyi graph, as well as a random sequence of insertions, deletions, and lookups, we compare to the Boost Graph Library included in C++.
 
 \appendix

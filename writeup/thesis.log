@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015) (preloaded format=pdflatex 2015.5.24)  22 MAR 2016 01:26
+This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015) (preloaded format=pdflatex 2015.5.24)  22 MAR 2016 02:24
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -252,18 +252,18 @@ LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <9> not available
 LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <18> not available
 (Font)              Font shape `OT1/ptm/b/n' tried instead on input line 47.
 LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <11> not available
-(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 51.
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 49.
 LaTeX Font Info:    Font shape `OT1/ptm/bx/it' in size <9> not available
-(Font)              Font shape `OT1/ptm/b/it' tried instead on input line 58.
+(Font)              Font shape `OT1/ptm/b/it' tried instead on input line 56.
 Package epstopdf Info: Source file: <images/linkedlist.eps>
-(epstopdf)                    date: 2016-03-21 21:51:15
+(epstopdf)                    date: 2016-03-22 02:21:40
 (epstopdf)                    size: 25580 bytes
 (epstopdf)             Output file: <images/linkedlist-eps-converted-to.pdf>
-(epstopdf)                    date: 2016-03-21 21:51:56
+(epstopdf)                    date: 2016-03-22 02:22:03
 (epstopdf)                    size: 7332 bytes
 (epstopdf)             Command: <repstopdf --outfile=images/linkedlist-eps-conv
 erted-to.pdf images/linkedlist.eps>
-(epstopdf)             \includegraphics on input line 76.
+(epstopdf)             \includegraphics on input line 74.
 Package epstopdf Info: Output file is already uptodate.
 
 <images/linkedlist-eps-converted-to.pdf, id=1, 493.845pt x 49.18375pt>
@@ -271,17 +271,17 @@ File: images/linkedlist-eps-converted-to.pdf Graphic file (type pdf)
 
 <use images/linkedlist-eps-converted-to.pdf>
 Package pdftex.def Info: images/linkedlist-eps-converted-to.pdf used on input l
-ine 76.
+ine 74.
 (pdftex.def)             Requested size: 172.84833pt x 17.21455pt.
 Package epstopdf Info: Source file: <images/linkedlist2.eps>
-(epstopdf)                    date: 2016-03-21 21:51:15
+(epstopdf)                    date: 2016-03-22 02:21:40
 (epstopdf)                    size: 26427 bytes
 (epstopdf)             Output file: <images/linkedlist2-eps-converted-to.pdf>
-(epstopdf)                    date: 2016-03-21 21:51:57
+(epstopdf)                    date: 2016-03-22 02:22:04
 (epstopdf)                    size: 7500 bytes
 (epstopdf)             Command: <repstopdf --outfile=images/linkedlist2-eps-con
 verted-to.pdf images/linkedlist2.eps>
-(epstopdf)             \includegraphics on input line 82.
+(epstopdf)             \includegraphics on input line 80.
 Package epstopdf Info: Output file is already uptodate.
 
 <images/linkedlist2-eps-converted-to.pdf, id=2, 493.845pt x 49.18375pt>
@@ -289,17 +289,17 @@ File: images/linkedlist2-eps-converted-to.pdf Graphic file (type pdf)
 
 <use images/linkedlist2-eps-converted-to.pdf>
 Package pdftex.def Info: images/linkedlist2-eps-converted-to.pdf used on input 
-line 82.
+line 80.
 (pdftex.def)             Requested size: 172.84833pt x 17.21455pt.
 Package epstopdf Info: Source file: <images/linkedlist3.eps>
-(epstopdf)                    date: 2016-03-21 21:51:15
+(epstopdf)                    date: 2016-03-22 02:21:40
 (epstopdf)                    size: 28247 bytes
 (epstopdf)             Output file: <images/linkedlist3-eps-converted-to.pdf>
-(epstopdf)                    date: 2016-03-21 21:51:58
+(epstopdf)                    date: 2016-03-22 02:22:06
 (epstopdf)                    size: 7760 bytes
 (epstopdf)             Command: <repstopdf --outfile=images/linkedlist3-eps-con
 verted-to.pdf images/linkedlist3.eps>
-(epstopdf)             \includegraphics on input line 89.
+(epstopdf)             \includegraphics on input line 87.
 Package epstopdf Info: Output file is already uptodate.
 
 <images/linkedlist3-eps-converted-to.pdf, id=3, 494.84875pt x 140.525pt>
@@ -307,17 +307,17 @@ File: images/linkedlist3-eps-converted-to.pdf Graphic file (type pdf)
 
 <use images/linkedlist3-eps-converted-to.pdf>
 Package pdftex.def Info: images/linkedlist3-eps-converted-to.pdf used on input 
-line 89.
+line 87.
 (pdftex.def)             Requested size: 173.19966pt x 49.18448pt.
 Package epstopdf Info: Source file: <images/treefig.eps>
-(epstopdf)                    date: 2016-03-21 21:51:15
+(epstopdf)                    date: 2016-03-22 02:21:40
 (epstopdf)                    size: 32885 bytes
 (epstopdf)             Output file: <images/treefig-eps-converted-to.pdf>
-(epstopdf)                    date: 2016-03-21 21:52:00
+(epstopdf)                    date: 2016-03-22 02:22:08
 (epstopdf)                    size: 8553 bytes
 (epstopdf)             Command: <repstopdf --outfile=images/treefig-eps-convert
 ed-to.pdf images/treefig.eps>
-(epstopdf)             \includegraphics on input line 99.
+(epstopdf)             \includegraphics on input line 97.
 Package epstopdf Info: Output file is already uptodate.
 
 <images/treefig-eps-converted-to.pdf, id=4, 390.45876pt x 349.305pt>
@@ -325,17 +325,17 @@ File: images/treefig-eps-converted-to.pdf Graphic file (type pdf)
 
 <use images/treefig-eps-converted-to.pdf>
 Package pdftex.def Info: images/treefig-eps-converted-to.pdf used on input line
- 99.
+ 97.
 (pdftex.def)             Requested size: 167.89398pt x 150.19821pt.
 Package epstopdf Info: Source file: <images/treefig2.eps>
-(epstopdf)                    date: 2016-03-21 21:51:15
+(epstopdf)                    date: 2016-03-22 02:21:40
 (epstopdf)                    size: 35984 bytes
 (epstopdf)             Output file: <images/treefig2-eps-converted-to.pdf>
-(epstopdf)                    date: 2016-03-21 21:52:02
+(epstopdf)                    date: 2016-03-22 02:22:11
 (epstopdf)                    size: 8964 bytes
 (epstopdf)             Command: <repstopdf --outfile=images/treefig2-eps-conver
 ted-to.pdf images/treefig2.eps>
-(epstopdf)             \includegraphics on input line 107.
+(epstopdf)             \includegraphics on input line 105.
 Package epstopdf Info: Output file is already uptodate.
 
 <images/treefig2-eps-converted-to.pdf, id=5, 501.875pt x 348.30125pt>
@@ -343,11 +343,8 @@ File: images/treefig2-eps-converted-to.pdf Graphic file (type pdf)
 
 <use images/treefig2-eps-converted-to.pdf>
 Package pdftex.def Info: images/treefig2-eps-converted-to.pdf used on input lin
-e 107.
+e 105.
 (pdftex.def)             Requested size: 215.80203pt x 149.76662pt.
-
-Underfull \vbox (badness 1184) has occurred while \output is active []
-
  [1{/usr/local/texlive/2015/texmf-var/fonts/map/pdftex/updmap/pdftex.map}
 
 
@@ -356,28 +353,28 @@ Non-PDF special ignored!
  <./images/linkedlist-eps-converted-to.pdf> <./images/linkedlist2-eps-converted
 -to.pdf> <./images/linkedlist3-eps-converted-to.pdf> <./images/treefig-eps-conv
 erted-to.pdf>]
-LaTeX Font Info:    Try loading font information for T3+ptm on input line 123.
+LaTeX Font Info:    Try loading font information for T3+ptm on input line 125.
 
 (/usr/local/texlive/2015/texmf-dist/tex/latex/tipa/t3ptm.fd
 File: t3ptm.fd 2001/12/31 TIPA font definitions
 )
-LaTeX Font Info:    Try loading font information for OMS+ptm on input line 126.
+LaTeX Font Info:    Try loading font information for OMS+ptm on input line 128.
 
 
 (/usr/local/texlive/2015/texmf-dist/tex/latex/psnfss/omsptm.fd
 File: omsptm.fd 
 )
 LaTeX Font Info:    Font shape `OMS/ptm/m/n' in size <8> not available
-(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 126.
+(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 128.
 Package epstopdf Info: Source file: <images/trie1.eps>
-(epstopdf)                    date: 2016-03-21 21:51:15
+(epstopdf)                    date: 2016-03-22 02:21:40
 (epstopdf)                    size: 30381 bytes
 (epstopdf)             Output file: <images/trie1-eps-converted-to.pdf>
-(epstopdf)                    date: 2016-03-21 21:52:04
+(epstopdf)                    date: 2016-03-22 02:22:12
 (epstopdf)                    size: 8383 bytes
 (epstopdf)             Command: <repstopdf --outfile=images/trie1-eps-converted
 -to.pdf images/trie1.eps>
-(epstopdf)             \includegraphics on input line 137.
+(epstopdf)             \includegraphics on input line 140.
 Package epstopdf Info: Output file is already uptodate.
 
 <images/trie1-eps-converted-to.pdf, id=52, 313.17pt x 262.9825pt>
@@ -385,17 +382,17 @@ File: images/trie1-eps-converted-to.pdf Graphic file (type pdf)
 
 <use images/trie1-eps-converted-to.pdf>
 Package pdftex.def Info: images/trie1-eps-converted-to.pdf used on input line 1
-37.
+40.
 (pdftex.def)             Requested size: 156.58461pt x 131.49092pt.
 Package epstopdf Info: Source file: <images/trie2.eps>
-(epstopdf)                    date: 2016-03-21 21:51:15
+(epstopdf)                    date: 2016-03-22 02:21:40
 (epstopdf)                    size: 43471 bytes
 (epstopdf)             Output file: <images/trie2-eps-converted-to.pdf>
-(epstopdf)                    date: 2016-03-21 21:52:06
+(epstopdf)                    date: 2016-03-22 02:22:14
 (epstopdf)                    size: 11037 bytes
 (epstopdf)             Command: <repstopdf --outfile=images/trie2-eps-converted
 -to.pdf images/trie2.eps>
-(epstopdf)             \includegraphics on input line 144.
+(epstopdf)             \includegraphics on input line 147.
 Package epstopdf Info: Output file is already uptodate.
 
 <images/trie2-eps-converted-to.pdf, id=53, 384.43625pt x 406.51875pt>
@@ -403,17 +400,17 @@ File: images/trie2-eps-converted-to.pdf Graphic file (type pdf)
 
 <use images/trie2-eps-converted-to.pdf>
 Package pdftex.def Info: images/trie2-eps-converted-to.pdf used on input line 1
-44.
+47.
 (pdftex.def)             Requested size: 192.21765pt x 203.25887pt.
 Package epstopdf Info: Source file: <images/trie2actual.eps>
-(epstopdf)                    date: 2016-03-21 21:51:15
-(epstopdf)                    size: 57273 bytes
+(epstopdf)                    date: 2016-03-22 02:21:40
+(epstopdf)                    size: 66425 bytes
 (epstopdf)             Output file: <images/trie2actual-eps-converted-to.pdf>
-(epstopdf)                    date: 2016-03-21 21:52:08
-(epstopdf)                    size: 12386 bytes
+(epstopdf)                    date: 2016-03-22 02:22:17
+(epstopdf)                    size: 14349 bytes
 (epstopdf)             Command: <repstopdf --outfile=images/trie2actual-eps-con
 verted-to.pdf images/trie2actual.eps>
-(epstopdf)             \includegraphics on input line 150.
+(epstopdf)             \includegraphics on input line 153.
 Package epstopdf Info: Output file is already uptodate.
 
 <images/trie2actual-eps-converted-to.pdf, id=54, 511.9125pt x 317.185pt>
@@ -421,125 +418,169 @@ File: images/trie2actual-eps-converted-to.pdf Graphic file (type pdf)
 
 <use images/trie2actual-eps-converted-to.pdf>
 Package pdftex.def Info: images/trie2actual-eps-converted-to.pdf used on input 
-line 150.
+line 153.
 (pdftex.def)             Requested size: 240.5989pt x 149.07695pt.
 
-Overfull \hbox (0.5989pt too wide) in paragraph at lines 150--152
- [][] 
- []
-
-Package epstopdf Info: Source file: <images/bitmask.eps>
-(epstopdf)                    date: 2016-03-21 21:51:15
-(epstopdf)                    size: 62209 bytes
-(epstopdf)             Output file: <images/bitmask-eps-converted-to.pdf>
-(epstopdf)                    date: 2016-03-21 21:52:12
-(epstopdf)                    size: 13604 bytes
-(epstopdf)             Command: <repstopdf --outfile=images/bitmask-eps-convert
-ed-to.pdf images/bitmask.eps>
-(epstopdf)             \includegraphics on input line 162.
-Package epstopdf Info: Output file is already uptodate.
-<images/bitmask-eps-converted-to.pdf, id=55, 553.06625pt x 207.77625pt>
-File: images/bitmask-eps-converted-to.pdf Graphic file (type pdf)
-
-<use images/bitmask-eps-converted-to.pdf>
-Package pdftex.def Info: images/bitmask-eps-converted-to.pdf used on input line
- 162.
-(pdftex.def)             Requested size: 237.81384pt x 89.34203pt.
- [2 <./images/treefig2-eps-converted-to.pdf> <./images/trie1-eps-converted-to.p
-df> <./images/trie2-eps-converted-to.pdf> <./images/trie2actual-eps-converted-t
-o.pdf>]
-Package epstopdf Info: Source file: <images/bitmask2.eps>
-(epstopdf)                    date: 2016-03-21 21:51:15
-(epstopdf)                    size: 70274 bytes
-(epstopdf)             Output file: <images/bitmask2-eps-converted-to.pdf>
-(epstopdf)                    date: 2016-03-21 21:52:16
-(epstopdf)                    size: 14951 bytes
-(epstopdf)             Command: <repstopdf --outfile=images/bitmask2-eps-conver
-ted-to.pdf images/bitmask2.eps>
-(epstopdf)             \includegraphics on input line 172.
-Package epstopdf Info: Output file is already uptodate.
-
-<images/bitmask2-eps-converted-to.pdf, id=106, 492.84125pt x 465.74pt>
-File: images/bitmask2-eps-converted-to.pdf Graphic file (type pdf)
-
-<use images/bitmask2-eps-converted-to.pdf>
-Package pdftex.def Info: images/bitmask2-eps-converted-to.pdf used on input lin
-e 172.
-(pdftex.def)             Requested size: 221.7765pt x 209.58105pt.
-Package epstopdf Info: Source file: <images/nodewithbitmaps.eps>
-(epstopdf)                    date: 2016-03-21 21:51:15
-(epstopdf)                    size: 66960 bytes
-(epstopdf)             Output file: <images/nodewithbitmaps-eps-converted-to.pd
-f>
-(epstopdf)                    date: 2016-03-21 21:52:22
-(epstopdf)                    size: 13806 bytes
-(epstopdf)             Command: <repstopdf --outfile=images/nodewithbitmaps-eps
--converted-to.pdf images/nodewithbitmaps.eps>
-(epstopdf)             \includegraphics on input line 180.
-Package epstopdf Info: Output file is already uptodate.
-
-<images/nodewithbitmaps-eps-converted-to.pdf, id=107, 536.0025pt x 293.095pt>
-File: images/nodewithbitmaps-eps-converted-to.pdf Graphic file (type pdf)
-
-<use images/nodewithbitmaps-eps-converted-to.pdf>
-Package pdftex.def Info: images/nodewithbitmaps-eps-converted-to.pdf used on in
-put line 180.
-(pdftex.def)             Requested size: 241.1989pt x 131.89153pt.
-
-Overfull \hbox (1.1989pt too wide) in paragraph at lines 180--182
- [][] 
- []
-
-Package epstopdf Info: Source file: <images/buffers.eps>
-(epstopdf)                    date: 2016-03-21 21:51:15
-(epstopdf)                    size: 71737 bytes
-(epstopdf)             Output file: <images/buffers-eps-converted-to.pdf>
-(epstopdf)                    date: 2016-03-21 21:52:29
-(epstopdf)                    size: 14571 bytes
-(epstopdf)             Command: <repstopdf --outfile=images/buffers-eps-convert
-ed-to.pdf images/buffers.eps>
-(epstopdf)             \includegraphics on input line 201.
-Package epstopdf Info: Output file is already uptodate.
-<images/buffers-eps-converted-to.pdf, id=108, 596.2275pt x 302.12875pt>
-File: images/buffers-eps-converted-to.pdf Graphic file (type pdf)
-
-<use images/buffers-eps-converted-to.pdf>
-Package pdftex.def Info: images/buffers-eps-converted-to.pdf used on input line
- 201.
-(pdftex.def)             Requested size: 250.41383pt x 126.8932pt.
-
-Overfull \hbox (10.41383pt too wide) in paragraph at lines 201--203
+Overfull \hbox (0.5989pt too wide) in paragraph at lines 153--155
  [][] 
  []
 
 
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
- [3 <./images/bitmask-eps-converted-to.pdf> <./images/bitmask2-eps-converted-to
-.pdf> <./images/nodewithbitmaps-eps-converted-to.pdf>] [4
+ [2 <./images/treefig2-eps-converted-to.pdf> <./images/trie1-eps-converted-to.p
+df> <./images/trie2-eps-converted-to.pdf>]
+Package epstopdf Info: Source file: <images/bitmask.eps>
+(epstopdf)                    date: 2016-03-22 02:21:40
+(epstopdf)                    size: 62209 bytes
+(epstopdf)             Output file: <images/bitmask-eps-converted-to.pdf>
+(epstopdf)                    date: 2016-03-22 02:22:21
+(epstopdf)                    size: 13604 bytes
+(epstopdf)             Command: <repstopdf --outfile=images/bitmask-eps-convert
+ed-to.pdf images/bitmask.eps>
+(epstopdf)             \includegraphics on input line 165.
+Package epstopdf Info: Output file is already uptodate.
 
- <./images/buffers-eps-converted-to.pdf>] (./thesis.aux) ) 
+<images/bitmask-eps-converted-to.pdf, id=92, 553.06625pt x 207.77625pt>
+File: images/bitmask-eps-converted-to.pdf Graphic file (type pdf)
+
+<use images/bitmask-eps-converted-to.pdf>
+Package pdftex.def Info: images/bitmask-eps-converted-to.pdf used on input line
+ 165.
+(pdftex.def)             Requested size: 237.81384pt x 89.34203pt.
+Package epstopdf Info: Source file: <images/bitmask2.eps>
+(epstopdf)                    date: 2016-03-22 02:21:40
+(epstopdf)                    size: 70274 bytes
+(epstopdf)             Output file: <images/bitmask2-eps-converted-to.pdf>
+(epstopdf)                    date: 2016-03-22 02:22:25
+(epstopdf)                    size: 14951 bytes
+(epstopdf)             Command: <repstopdf --outfile=images/bitmask2-eps-conver
+ted-to.pdf images/bitmask2.eps>
+(epstopdf)             \includegraphics on input line 175.
+Package epstopdf Info: Output file is already uptodate.
+
+<images/bitmask2-eps-converted-to.pdf, id=93, 492.84125pt x 465.74pt>
+File: images/bitmask2-eps-converted-to.pdf Graphic file (type pdf)
+
+<use images/bitmask2-eps-converted-to.pdf>
+Package pdftex.def Info: images/bitmask2-eps-converted-to.pdf used on input lin
+e 175.
+(pdftex.def)             Requested size: 221.7765pt x 209.58105pt.
+
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+Package epstopdf Info: Source file: <images/nodewithbitmaps.eps>
+(epstopdf)                    date: 2016-03-22 02:21:40
+(epstopdf)                    size: 66960 bytes
+(epstopdf)             Output file: <images/nodewithbitmaps-eps-converted-to.pd
+f>
+(epstopdf)                    date: 2016-03-22 02:22:31
+(epstopdf)                    size: 13806 bytes
+(epstopdf)             Command: <repstopdf --outfile=images/nodewithbitmaps-eps
+-converted-to.pdf images/nodewithbitmaps.eps>
+(epstopdf)             \includegraphics on input line 183.
+Package epstopdf Info: Output file is already uptodate.
+
+<images/nodewithbitmaps-eps-converted-to.pdf, id=94, 536.0025pt x 293.095pt>
+File: images/nodewithbitmaps-eps-converted-to.pdf Graphic file (type pdf)
+
+<use images/nodewithbitmaps-eps-converted-to.pdf>
+Package pdftex.def Info: images/nodewithbitmaps-eps-converted-to.pdf used on in
+put line 183.
+(pdftex.def)             Requested size: 241.1989pt x 131.89153pt.
+
+Overfull \hbox (1.1989pt too wide) in paragraph at lines 183--185
+ [][] 
+ []
+
+Package epstopdf Info: Source file: <images/balancing.eps>
+(epstopdf)                    date: 2016-03-22 02:21:40
+(epstopdf)                    size: 52125 bytes
+(epstopdf)             Output file: <images/balancing-eps-converted-to.pdf>
+(epstopdf)                    date: 2016-03-22 02:22:33
+(epstopdf)                    size: 12418 bytes
+(epstopdf)             Command: <repstopdf --outfile=images/balancing-eps-conve
+rted-to.pdf images/balancing.eps>
+(epstopdf)             \includegraphics on input line 196.
+Package epstopdf Info: Output file is already uptodate.
+<images/balancing-eps-converted-to.pdf, id=95, 469.755pt x 403.5075pt>
+File: images/balancing-eps-converted-to.pdf Graphic file (type pdf)
+
+<use images/balancing-eps-converted-to.pdf>
+Package pdftex.def Info: images/balancing-eps-converted-to.pdf used on input li
+ne 196.
+(pdftex.def)             Requested size: 211.3878pt x 181.57669pt.
+ [3 <./images/trie2actual-eps-converted-to.pdf> <./images/bitmask-eps-converted
+-to.pdf> <./images/bitmask2-eps-converted-to.pdf> <./images/nodewithbitmaps-eps
+-converted-to.pdf>]
+Package epstopdf Info: Source file: <images/balancing2.eps>
+(epstopdf)                    date: 2016-03-22 02:21:40
+(epstopdf)                    size: 40709 bytes
+(epstopdf)             Output file: <images/balancing2-eps-converted-to.pdf>
+(epstopdf)                    date: 2016-03-22 02:22:34
+(epstopdf)                    size: 9992 bytes
+(epstopdf)             Command: <repstopdf --outfile=images/balancing2-eps-conv
+erted-to.pdf images/balancing2.eps>
+(epstopdf)             \includegraphics on input line 201.
+Package epstopdf Info: Output file is already uptodate.
+
+<images/balancing2-eps-converted-to.pdf, id=155, 459.7175pt x 323.2075pt>
+File: images/balancing2-eps-converted-to.pdf Graphic file (type pdf)
+
+<use images/balancing2-eps-converted-to.pdf>
+Package pdftex.def Info: images/balancing2-eps-converted-to.pdf used on input l
+ine 201.
+(pdftex.def)             Requested size: 206.87096pt x 145.44203pt.
+Package epstopdf Info: Source file: <images/buffers.eps>
+(epstopdf)                    date: 2016-03-22 02:21:40
+(epstopdf)                    size: 71737 bytes
+(epstopdf)             Output file: <images/buffers-eps-converted-to.pdf>
+(epstopdf)                    date: 2016-03-22 02:22:41
+(epstopdf)                    size: 14571 bytes
+(epstopdf)             Command: <repstopdf --outfile=images/buffers-eps-convert
+ed-to.pdf images/buffers.eps>
+(epstopdf)             \includegraphics on input line 214.
+Package epstopdf Info: Output file is already uptodate.
+
+<images/buffers-eps-converted-to.pdf, id=156, 596.2275pt x 302.12875pt>
+File: images/buffers-eps-converted-to.pdf Graphic file (type pdf)
+
+<use images/buffers-eps-converted-to.pdf>
+Package pdftex.def Info: images/buffers-eps-converted-to.pdf used on input line
+ 214.
+(pdftex.def)             Requested size: 250.41383pt x 126.8932pt.
+
+Overfull \hbox (10.41383pt too wide) in paragraph at lines 214--216
+ [][] 
+ []
+
+
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+ [4 <./images/balancing-eps-converted-to.pdf> <./images/balancing2-eps-converte
+d-to.pdf> <./images/buffers-eps-converted-to.pdf>] (./thesis.aux) ) 
 Here is how much of TeX's memory you used:
- 3855 strings out of 493089
- 50420 string characters out of 6134842
- 115337 words of memory out of 5000000
- 7261 multiletter control sequences out of 15000+600000
- 24954 words of font info for 46 fonts, out of 8000000 for 9000
+ 3866 strings out of 493089
+ 50791 string characters out of 6134842
+ 116337 words of memory out of 5000000
+ 7269 multiletter control sequences out of 15000+600000
+ 26032 words of font info for 47 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 37i,7n,34p,262b,223s stack positions out of 5000i,500n,10000p,200000b,80000s
-{/usr/local/texlive/2
-015/texmf-dist/fonts/enc/dvips/base/8r.enc}</usr/local/texlive/2015/texmf-dist/
-fonts/type1/public/amsfonts/cm/cmss9.pfb></usr/local/texlive/2015/texmf-dist/fo
-nts/type1/public/amsfonts/cm/cmsy8.pfb></usr/local/texlive/2015/texmf-dist/font
-s/type1/public/amsfonts/cm/cmtt9.pfb></usr/local/texlive/2015/texmf-dist/fonts/
-type1/urw/times/utmb8a.pfb></usr/local/texlive/2015/texmf-dist/fonts/type1/urw/
-times/utmbi8a.pfb></usr/local/texlive/2015/texmf-dist/fonts/type1/urw/times/utm
-r8a.pfb></usr/local/texlive/2015/texmf-dist/fonts/type1/urw/times/utmri8a.pfb><
-/usr/local/texlive/2015/texmf-dist/fonts/type1/public/tipa/xipa10.pfb>
-Output written on thesis.pdf (4 pages, 187610 bytes).
+ 37i,7n,34p,270b,223s stack positions out of 5000i,500n,10000p,200000b,80000s
+{/usr/local/
+texlive/2015/texmf-dist/fonts/enc/dvips/base/8r.enc}</usr/local/texlive/2015/te
+xmf-dist/fonts/type1/public/amsfonts/cm/cmss9.pfb></usr/local/texlive/2015/texm
+f-dist/fonts/type1/public/amsfonts/cm/cmsy8.pfb></usr/local/texlive/2015/texmf-
+dist/fonts/type1/public/amsfonts/cm/cmtt9.pfb></usr/local/texlive/2015/texmf-di
+st/fonts/type1/urw/times/utmb8a.pfb></usr/local/texlive/2015/texmf-dist/fonts/t
+ype1/urw/times/utmbi8a.pfb></usr/local/texlive/2015/texmf-dist/fonts/type1/urw/
+times/utmr8a.pfb></usr/local/texlive/2015/texmf-dist/fonts/type1/urw/times/utmr
+i8a.pfb></usr/local/texlive/2015/texmf-dist/fonts/type1/public/tipa/xipa10.pfb>
+
+Output written on thesis.pdf (4 pages, 206062 bytes).
 PDF statistics:
- 195 PDF objects out of 1000 (max. 8388607)
- 119 compressed objects within 2 object streams
+ 223 PDF objects out of 1000 (max. 8388607)
+ 135 compressed objects within 2 object streams
  0 named destinations out of 1000 (max. 500000)
- 61 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 71 words of extra memory for PDF output out of 10000 (max. 10000000)
 

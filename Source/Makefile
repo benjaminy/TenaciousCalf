@@ -8,7 +8,7 @@ boost.o: boost.cpp
 	g++ -c -g $<
 
 test: boost.o c_t_2.o tester.o
-	g++ -o $@ -g $?
+	g++ -o -std=c99 $@ -g $?
 
 clean:
 	rm -f c_t_2.o tester.o boost.o test

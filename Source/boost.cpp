@@ -15,9 +15,9 @@ extern "C" {
 #include <map>
 #include <sys/time.h>
 
+#ifdef USE_UINT64_T
 typedef struct two_ids_thing two_ids_thing, *two_ids_thing_p;
 
-#ifdef USE_UINT64_T
 struct two_ids_thing {
     uint64_t source;
     uint64_t target;
@@ -35,13 +35,13 @@ typedef boost::property_map<Graph, boost::vertex_index_t>::type IndexMap;
 typedef boost::graph_traits<Graph> GraphTraits;
 typedef boost::graph_traits<Graph>::vertex_iterator vertex_iter;
 
-uint32_t size_walk = 100000000;
+uint32_t size_walk = 10;
 int_type *id_array = (int_type *)malloc(sizeof(id_array[0])*size_walk);
 uint32_t node_count = 0;
-long long n_count = 1000000;
+long long n_count = 50000;
 Vertex vt;
 
-float random_walk(Vertex vt, IndexMap index, Graph g) {
+float random_walk(Vertex vt, IndexMap index, Graph g, std::map<int_type, int_type> self_map) {
     struct timeval tval_before, tval_after, tval_result;
     gettimeofday(&tval_before, NULL);
     for (int i=0;i<size_walk;i++) {
@@ -49,7 +49,7 @@ float random_walk(Vertex vt, IndexMap index, Graph g) {
         GraphTraits::edge_descriptor e;
         int e_degree = out_degree(vt, g);
         while (e_degree == 0) {
-            int r = random_int(0, n_count-1);
+            int_type r = self_map[random_int(0, n_count-1)];
             std::pair<vertex_iter, vertex_iter> vp;
             vp = vertices(g);
             vp.first = vp.first + r;
@@ -68,13 +68,13 @@ float random_walk(Vertex vt, IndexMap index, Graph g) {
     float time_elapsed = ((long int)tval_result.tv_usec + (long int)tval_result.tv_sec/1000000)/1000000.0;
     return time_elapsed;
 }
-float random_walk_c(val_t vt, cow_trie_p g) {
+float random_walk_c(val_t vt, cow_trie_p g, std::map<int_type, int_type> map) {
     struct timeval tval_before, tval_after, tval_result;
     gettimeofday(&tval_before, NULL);
     for (int i=0;i<size_walk;i++) {
         uint32_t e_degree = vt._.node.succ_ct;
         while (e_degree == 0) {
-            int random_vertex = random_int(0, n_count-1);
+            int_type random_vertex = map[random_int(0, n_count-1)];
             cow_trie_lookup(g, random_vertex, &vt);
             e_degree = vt._.node.succ_ct;
         }
@@ -105,8 +105,12 @@ int main() {
     boost::graph_traits<Graph>::adjacency_iterator ai;
     boost::graph_traits<Graph>::adjacency_iterator ai_end;
     boost::minstd_rand gen;
-
+    
+    #ifdef USE_UINT64_T
     std::map<two_ids_thing, uint32_t> m;
+    #else
+    std::map<uint64_t, uint32_t> m;
+    #endif
     std::map<int_type, int_type> id_map;
     std::map<int_type, int_type> self_map;
 
@@ -125,7 +129,7 @@ int main() {
     my_map->ref_count = 1;
     my_map->child_bitmap = 0;
     my_map->value_bitmap = 0;
-    uint32_t id = 0;
+    int_type id = 0;
 
     std::cout << "beginning vertex iteration\n\n";
     std::pair<vertex_iter, vertex_iter> vp;
@@ -134,8 +138,9 @@ int main() {
         boost::tie(out_i, out_end) = out_edges(v, g);
         uint32_t deg = out_degree(v, g);
         int_type *succs = new int_type[deg];
-        val_t my_val = cow_trie_create_val(0, deg, succs, 0, 0);
-        int_type my_id = cow_trie_insert(my_map, my_val, &my_map);
+        val_p my_val = cow_trie_create_val(0, deg, succs, 0, 0);
+        int_type my_id = cow_trie_insert(my_map, *my_val, &my_map);
+        free(my_val);
         id_map[id] = my_id;
         self_map[id] = id;
         ++id;
@@ -146,12 +151,17 @@ int main() {
     boost::tie(ei, ei_end) = edges(g);
     std::cout << "id before is" << id << "\n\n"; 
     for (ei; ei != ei_end; ++ei) {
-        val_t my_val = cow_trie_create_val(1, 0, 0, id_map[index[source(*ei, g)]], id_map[index[target(*ei, g)]]);
-        int_type my_id = cow_trie_insert(my_map, my_val, &my_map);
+        val_p my_val = cow_trie_create_val(1, 0, 0, id_map[index[source(*ei, g)]], id_map[index[target(*ei, g)]]);
+        int_type my_id = cow_trie_insert(my_map, *my_val, &my_map);
+        free(my_val);
+        #ifdef USE_UINT64_T
         two_ids_thing t;
         t.source = index[source(*ei, g)];
         t.target = index[target(*ei, g)];
-        m[t] = id;
+        m[t] = my_id;
+        #else
+        m[index[source(*ei, g)] << 32 | index[target(*ei, g)]] = my_id;
+        #endif
         id_map[id] = my_id;
         self_map[id] = id;
         ++id;
@@ -170,11 +180,15 @@ int main() {
         for (out_i; out_i != out_end; ++out_i) {
             e = *out_i;
             Vertex src = source(e, g), targ = target(e, g);
+            #ifdef USE_UINT64_T
             two_ids_thing t;
             t.source = index[src];
             t.target = index[targ];
+            #else
+            uint64_t t = index[src] << 32 | index[targ];
+            #endif
             int_type id = m[t];
-            succs[eindex] = id_map[id];
+            succs[eindex] = id;
             ++eindex;
         }
         p++;
@@ -183,7 +197,7 @@ int main() {
     cow_trie_lookup(my_map, 0, &v);
     Vertex vtest = *vertices(g).first;
     std::cout << "beginning random traversal\n\n";
-    //float t2 = random_walk_c(v, my_map);
-    float t1 = random_walk(vtest, index, g);
+    float t2 = random_walk_c(v, my_map, id_map);
+    float t1 = random_walk(vtest, index, g, self_map);
     std::cout << "end random traversal\n\n";
 }

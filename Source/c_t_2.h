@@ -1,6 +1,6 @@
 #ifndef C_T_2_H_
 #define C_T_2_H_
-#define USE_UINT64_T
+//#define USE_UINT64_T
 
 typedef struct val_t val_t, *val_p;
 
@@ -79,7 +79,7 @@ int cow_trie_delete(cow_trie_p map, vkey_t key, cow_trie_p *res);
 
 cow_trie_p *cow_trie_children( cow_trie_p map);
 
-val_t cow_trie_create_val(int tag,
+val_p cow_trie_create_val(int tag,
                           #if COW_INCLUDE_PREDS
                           size_t pred_ct, 
                           #endif

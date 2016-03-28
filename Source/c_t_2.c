@@ -83,7 +83,7 @@ void cow_close_edge_list(edge_list_p e) {
     }
 }
 
-val_t cow_trie_create_val(int tag,
+val_p cow_trie_create_val(int tag,
                           #ifdef COW_INCLUDE_PREDS
                           size_t pred_ct,
                           #endif
@@ -109,7 +109,7 @@ val_t cow_trie_create_val(int tag,
         thing->_.edge.pred = pred;
         thing->_.edge.succ = succ;
     }
-    return *thing;
+    return thing;
 }
 
 static val_p cow_trie_values( cow_trie_p m )
@@ -218,23 +218,17 @@ int cow_trie_lookup(
     #ifdef USE_UINT64_T
     int_type   bitmask_loc = 1UL << virtual_idx;
     #else
-    int_typ    bitmask_loc = 1 << virtual_idx;
+    int_type   bitmask_loc = 1 << virtual_idx;
     #endif
-    int_type   bitmask_lower;
+    int_type   bitmask_lower = 0;
     int_type   shift_amt = LVL_CAPACITY - virtual_idx;
     #ifdef USE_UINT64_T
-    if (shift_amt != LVL_CAPACITY) {
+    if (virtual_idx != 0UL) {
         bitmask_lower = ( ~0UL ) >> ( shift_amt );
     }
-    else {
-        bitmask_lower = 0UL;
-    }
     #else
-    if (shift_amt != LVL_CAPACITY) {
+    if (virtual_idx != 0) {
         bitmask_lower = ( ~0U ) >> ( shift_amt );
-    }
-    else {
-        bitmask_lower = 0;
     }
     #endif
     if( bitmask_loc & map->value_bitmap )
@@ -515,7 +509,7 @@ int cow_trie_delete(cow_trie_p map, vkey_t key, cow_trie_p *res) {
     }
     #else
     if (virtual_idx != 0) {
-        bitmask_lower = ( ~0UL ) >> ( shift_amt );
+        bitmask_lower = ( ~0U ) >> ( shift_amt );
     }
     else {
         bitmask_lower = 0;

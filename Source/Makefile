@@ -1,14 +1,14 @@
-cow_trie.o: cow_trie.c
-	g++ -c -g -O1 $<
+c_t_2.o: c_t_2.c
+	${CC} -c -g -O0 $?
 
 tester.o: tester.c
-	g++ -c -g -O1 $<
+	${CC} -c -g -O0 $?
 
 boost.o: boost.cpp
 	g++ -c -g $<
 
-test: boost.o cow_trie.o tester.o
+test: boost.o c_t_2.o tester.o
 	g++ -o $@ -g $?
 
 clean:
-	rm -f cow_trie.o tester.o boost.o test
+	rm -f c_t_2.o tester.o boost.o test

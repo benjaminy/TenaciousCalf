@@ -8,6 +8,7 @@
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/random.hpp>
 #include <stdint.h>
+#include <stdio.h>
 extern "C" {
     #include "c_t_2.h"
     #include "tester.h"

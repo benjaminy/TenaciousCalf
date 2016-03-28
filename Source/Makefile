@@ -1,14 +1,14 @@
 c_t_2.o: c_t_2.c
-	${CC} -c -g -O0 $?
+	${CC} -c -g -std=c99 -O0 $?
 
 tester.o: tester.c
-	${CC} -c -g -O0 $?
+	${CC} -c -g -std=c99 -O0 $?
 
 boost.o: boost.cpp
-	g++ -c -g $<
+	g++ -c -std=c99 -g $<
 
 test: boost.o c_t_2.o tester.o
-	g++ -o -std=c99 $@ -g $?
+	g++ -o $@ -g $?
 
 clean:
 	rm -f c_t_2.o tester.o boost.o test
